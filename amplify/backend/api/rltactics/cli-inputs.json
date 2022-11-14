@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "rltactics",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "/mnt/c/Users/tareh/code/rltactics/rltactics-vue/amplify/backend/api/rltactics/schema.graphql",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 7
+    }
+  }
+}
