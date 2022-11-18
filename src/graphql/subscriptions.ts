@@ -11,19 +11,11 @@ export const onCreateTacticsLobby = /* GraphQL */ `
         id
         title
         teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
         rounds {
           nextToken
         }
         createdAt
         updatedAt
-        gameLobbyId
       }
       createdAt
       updatedAt
@@ -40,19 +32,11 @@ export const onUpdateTacticsLobby = /* GraphQL */ `
         id
         title
         teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
         rounds {
           nextToken
         }
         createdAt
         updatedAt
-        gameLobbyId
       }
       createdAt
       updatedAt
@@ -69,19 +53,11 @@ export const onDeleteTacticsLobby = /* GraphQL */ `
         id
         title
         teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
         rounds {
           nextToken
         }
         createdAt
         updatedAt
-        gameLobbyId
       }
       createdAt
       updatedAt
@@ -95,21 +71,6 @@ export const onCreateGame = /* GraphQL */ `
       id
       title
       teamSize
-      lobby {
-        id
-        name
-        game {
-          id
-          title
-          teamSize
-          createdAt
-          updatedAt
-          gameLobbyId
-        }
-        createdAt
-        updatedAt
-        tacticsLobbyGameId
-      }
       rounds {
         items {
           id
@@ -121,7 +82,6 @@ export const onCreateGame = /* GraphQL */ `
       }
       createdAt
       updatedAt
-      gameLobbyId
     }
   }
 `;
@@ -131,21 +91,6 @@ export const onUpdateGame = /* GraphQL */ `
       id
       title
       teamSize
-      lobby {
-        id
-        name
-        game {
-          id
-          title
-          teamSize
-          createdAt
-          updatedAt
-          gameLobbyId
-        }
-        createdAt
-        updatedAt
-        tacticsLobbyGameId
-      }
       rounds {
         items {
           id
@@ -157,7 +102,6 @@ export const onUpdateGame = /* GraphQL */ `
       }
       createdAt
       updatedAt
-      gameLobbyId
     }
   }
 `;
@@ -167,21 +111,6 @@ export const onDeleteGame = /* GraphQL */ `
       id
       title
       teamSize
-      lobby {
-        id
-        name
-        game {
-          id
-          title
-          teamSize
-          createdAt
-          updatedAt
-          gameLobbyId
-        }
-        createdAt
-        updatedAt
-        tacticsLobbyGameId
-      }
       rounds {
         items {
           id
@@ -193,7 +122,6 @@ export const onDeleteGame = /* GraphQL */ `
       }
       createdAt
       updatedAt
-      gameLobbyId
     }
   }
 `;
@@ -201,24 +129,6 @@ export const onCreateGameRound = /* GraphQL */ `
   subscription OnCreateGameRound {
     onCreateGameRound {
       id
-      game {
-        id
-        title
-        teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
-        rounds {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        gameLobbyId
-      }
       createdAt
       updatedAt
       gameRoundsId
@@ -229,24 +139,6 @@ export const onUpdateGameRound = /* GraphQL */ `
   subscription OnUpdateGameRound {
     onUpdateGameRound {
       id
-      game {
-        id
-        title
-        teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
-        rounds {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        gameLobbyId
-      }
       createdAt
       updatedAt
       gameRoundsId
@@ -257,24 +149,6 @@ export const onDeleteGameRound = /* GraphQL */ `
   subscription OnDeleteGameRound {
     onDeleteGameRound {
       id
-      game {
-        id
-        title
-        teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
-        rounds {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        gameLobbyId
-      }
       createdAt
       updatedAt
       gameRoundsId

@@ -12,11 +12,9 @@ type Game @model {
   id: ID!
   title: String!
   teamSize: Int!
-  lobby: TacticsLobby @belongsTo
   rounds: [GameRound] @hasMany
 }
 
 type GameRound @model {
   id: ID!
-  game: Game @belongsTo
 }

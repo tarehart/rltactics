@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import CreateLobbyForm from './components/CreateLobbyForm.vue';
 import HelloWorld from './components/HelloWorld.vue'
 </script>
 
@@ -9,6 +10,7 @@ import HelloWorld from './components/HelloWorld.vue'
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
+      <CreateLobbyForm />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>

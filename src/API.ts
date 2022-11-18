@@ -87,11 +87,9 @@ export type Game = {
   id: string,
   title: string,
   teamSize: number,
-  lobby?: TacticsLobby | null,
   rounds?: ModelGameRoundConnection | null,
   createdAt: string,
   updatedAt: string,
-  gameLobbyId?: string | null,
 };
 
 export type ModelGameRoundConnection = {
@@ -103,7 +101,6 @@ export type ModelGameRoundConnection = {
 export type GameRound = {
   __typename: "GameRound",
   id: string,
-  game?: Game | null,
   createdAt: string,
   updatedAt: string,
   gameRoundsId?: string | null,
@@ -123,7 +120,6 @@ export type CreateGameInput = {
   id?: string | null,
   title: string,
   teamSize: number,
-  gameLobbyId?: string | null,
 };
 
 export type ModelGameConditionInput = {
@@ -132,7 +128,6 @@ export type ModelGameConditionInput = {
   and?: Array< ModelGameConditionInput | null > | null,
   or?: Array< ModelGameConditionInput | null > | null,
   not?: ModelGameConditionInput | null,
-  gameLobbyId?: ModelIDInput | null,
 };
 
 export type ModelIntInput = {
@@ -151,7 +146,6 @@ export type UpdateGameInput = {
   id: string,
   title?: string | null,
   teamSize?: number | null,
-  gameLobbyId?: string | null,
 };
 
 export type DeleteGameInput = {
@@ -201,7 +195,6 @@ export type ModelGameFilterInput = {
   and?: Array< ModelGameFilterInput | null > | null,
   or?: Array< ModelGameFilterInput | null > | null,
   not?: ModelGameFilterInput | null,
-  gameLobbyId?: ModelIDInput | null,
 };
 
 export type ModelGameConnection = {
@@ -233,21 +226,12 @@ export type CreateTacticsLobbyMutation = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -270,21 +254,12 @@ export type UpdateTacticsLobbyMutation = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -307,21 +282,12 @@ export type DeleteTacticsLobbyMutation = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -340,23 +306,6 @@ export type CreateGameMutation = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -370,7 +319,6 @@ export type CreateGameMutation = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -385,23 +333,6 @@ export type UpdateGameMutation = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -415,7 +346,6 @@ export type UpdateGameMutation = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -430,23 +360,6 @@ export type DeleteGameMutation = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -460,7 +373,6 @@ export type DeleteGameMutation = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -473,27 +385,6 @@ export type CreateGameRoundMutation = {
   createGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -509,27 +400,6 @@ export type UpdateGameRoundMutation = {
   updateGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -545,27 +415,6 @@ export type DeleteGameRoundMutation = {
   deleteGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -586,21 +435,12 @@ export type GetTacticsLobbyQuery = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -628,7 +468,6 @@ export type ListTacticsLobbiesQuery = {
         teamSize: number,
         createdAt: string,
         updatedAt: string,
-        gameLobbyId?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
@@ -648,23 +487,6 @@ export type GetGameQuery = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -678,7 +500,6 @@ export type GetGameQuery = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -696,21 +517,12 @@ export type ListGamesQuery = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -724,27 +536,6 @@ export type GetGameRoundQuery = {
   getGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -763,15 +554,6 @@ export type ListGameRoundsQuery = {
     items:  Array< {
       __typename: "GameRound",
       id: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
       createdAt: string,
       updatedAt: string,
       gameRoundsId?: string | null,
@@ -790,21 +572,12 @@ export type OnCreateTacticsLobbySubscription = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -822,21 +595,12 @@ export type OnUpdateTacticsLobbySubscription = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -854,21 +618,12 @@ export type OnDeleteTacticsLobbySubscription = {
       id: string,
       title: string,
       teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
       rounds?:  {
         __typename: "ModelGameRoundConnection",
         nextToken?: string | null,
       } | null,
       createdAt: string,
       updatedAt: string,
-      gameLobbyId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -882,23 +637,6 @@ export type OnCreateGameSubscription = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -912,7 +650,6 @@ export type OnCreateGameSubscription = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -922,23 +659,6 @@ export type OnUpdateGameSubscription = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -952,7 +672,6 @@ export type OnUpdateGameSubscription = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -962,23 +681,6 @@ export type OnDeleteGameSubscription = {
     id: string,
     title: string,
     teamSize: number,
-    lobby?:  {
-      __typename: "TacticsLobby",
-      id: string,
-      name: string,
-      game?:  {
-        __typename: "Game",
-        id: string,
-        title: string,
-        teamSize: number,
-        createdAt: string,
-        updatedAt: string,
-        gameLobbyId?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      tacticsLobbyGameId?: string | null,
-    } | null,
     rounds?:  {
       __typename: "ModelGameRoundConnection",
       items:  Array< {
@@ -992,7 +694,6 @@ export type OnDeleteGameSubscription = {
     } | null,
     createdAt: string,
     updatedAt: string,
-    gameLobbyId?: string | null,
   } | null,
 };
 
@@ -1000,27 +701,6 @@ export type OnCreateGameRoundSubscription = {
   onCreateGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -1031,27 +711,6 @@ export type OnUpdateGameRoundSubscription = {
   onUpdateGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,
@@ -1062,27 +721,6 @@ export type OnDeleteGameRoundSubscription = {
   onDeleteGameRound?:  {
     __typename: "GameRound",
     id: string,
-    game?:  {
-      __typename: "Game",
-      id: string,
-      title: string,
-      teamSize: number,
-      lobby?:  {
-        __typename: "TacticsLobby",
-        id: string,
-        name: string,
-        createdAt: string,
-        updatedAt: string,
-        tacticsLobbyGameId?: string | null,
-      } | null,
-      rounds?:  {
-        __typename: "ModelGameRoundConnection",
-        nextToken?: string | null,
-      } | null,
-      createdAt: string,
-      updatedAt: string,
-      gameLobbyId?: string | null,
-    } | null,
     createdAt: string,
     updatedAt: string,
     gameRoundsId?: string | null,

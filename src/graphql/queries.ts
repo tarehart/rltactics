@@ -11,19 +11,11 @@ export const getTacticsLobby = /* GraphQL */ `
         id
         title
         teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
         rounds {
           nextToken
         }
         createdAt
         updatedAt
-        gameLobbyId
       }
       createdAt
       updatedAt
@@ -47,7 +39,6 @@ export const listTacticsLobbies = /* GraphQL */ `
           teamSize
           createdAt
           updatedAt
-          gameLobbyId
         }
         createdAt
         updatedAt
@@ -63,21 +54,6 @@ export const getGame = /* GraphQL */ `
       id
       title
       teamSize
-      lobby {
-        id
-        name
-        game {
-          id
-          title
-          teamSize
-          createdAt
-          updatedAt
-          gameLobbyId
-        }
-        createdAt
-        updatedAt
-        tacticsLobbyGameId
-      }
       rounds {
         items {
           id
@@ -89,7 +65,6 @@ export const getGame = /* GraphQL */ `
       }
       createdAt
       updatedAt
-      gameLobbyId
     }
   }
 `;
@@ -104,19 +79,11 @@ export const listGames = /* GraphQL */ `
         id
         title
         teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
         rounds {
           nextToken
         }
         createdAt
         updatedAt
-        gameLobbyId
       }
       nextToken
     }
@@ -126,24 +93,6 @@ export const getGameRound = /* GraphQL */ `
   query GetGameRound($id: ID!) {
     getGameRound(id: $id) {
       id
-      game {
-        id
-        title
-        teamSize
-        lobby {
-          id
-          name
-          createdAt
-          updatedAt
-          tacticsLobbyGameId
-        }
-        rounds {
-          nextToken
-        }
-        createdAt
-        updatedAt
-        gameLobbyId
-      }
       createdAt
       updatedAt
       gameRoundsId
@@ -159,14 +108,6 @@ export const listGameRounds = /* GraphQL */ `
     listGameRounds(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        game {
-          id
-          title
-          teamSize
-          createdAt
-          updatedAt
-          gameLobbyId
-        }
         createdAt
         updatedAt
         gameRoundsId
