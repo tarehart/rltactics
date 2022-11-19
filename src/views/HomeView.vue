@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import CreateLobbyForm from '@/components/CreateLobbyForm.vue';
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    Eventually I'll list out the user's lobbies here.
+    <CreateLobbyForm />
   </main>
 </template>

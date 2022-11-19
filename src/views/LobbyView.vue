@@ -5,12 +5,15 @@
     <span>Created {{lobby.createdAt}}</span>
   </div>
   <span v-else>LOADING</span>
-  <GeometryView filename="pitch" />
+  <div class="draw-section">
+    <GeometryView filename="pitch" />
+  </div>
+  
 </template>
 
 <script lang="ts">
   import type { TacticsLobby } from '@/API';
-import GeometryView from '@/components/GeometryView.vue';
+  import GeometryView from '@/components/GeometryView.vue';
   import type { GraphQLResult } from '@aws-amplify/api-graphql';
   import { API } from 'aws-amplify';
   import { getTacticsLobby } from '../graphql/queries';
@@ -41,3 +44,12 @@ import GeometryView from '@/components/GeometryView.vue';
     components: { GeometryView }
 };
 </script>
+
+<style scoped>
+  .draw-section {
+    margin-top: 20px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #55555511;
+  }
+</style>
