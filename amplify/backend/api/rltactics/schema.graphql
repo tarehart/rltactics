@@ -12,9 +12,50 @@ type Game @model {
   id: ID!
   title: String!
   teamSize: Int!
-  rounds: [GameRound] @hasMany
+  rounds: [GameRound!]! @hasMany
+}
+
+type Car {
+  id: ID!
+  team: Int!
+}
+
+type CarState {
+  car: Car!
+  boostAmount: Int!
+  position: Vector!
+  velocity: Vector!
+}
+
+type BallState {
+  position: Vector!
+  velocity: Vector!
+}
+
+type Vector {
+  x: Float!
+  y: Float!
 }
 
 type GameRound @model {
   id: ID!
+  gameRoundsId: ID!
+  initialCarStates: [CarState!]!
+  initialBallState: BallState!
+  carPlans: [CarPlan!]!
+}
+
+type Subscription {
+  onGameRoundByGameId(gameRoundsId: ID!): GameRound
+    @aws_subscribe(mutations: ["createGameRound"])
+}
+
+type CarPlan {
+  steps: [PlanStep!]!
+}
+
+type PlanStep {
+  waypoint: Vector!
+  useBoost: Boolean!
+  startDodge: Boolean!
 }

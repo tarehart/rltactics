@@ -101,9 +101,50 @@ export type ModelGameRoundConnection = {
 export type GameRound = {
   __typename: "GameRound",
   id: string,
+  gameRoundsId: string,
+  initialCarStates:  Array<CarState >,
+  initialBallState: BallState,
+  carPlans:  Array<CarPlan >,
   createdAt: string,
   updatedAt: string,
-  gameRoundsId?: string | null,
+};
+
+export type CarState = {
+  __typename: "CarState",
+  car: Car,
+  boostAmount: number,
+  position: Vector,
+  velocity: Vector,
+};
+
+export type Car = {
+  __typename: "Car",
+  id: string,
+  team: number,
+};
+
+export type Vector = {
+  __typename: "Vector",
+  x: number,
+  y: number,
+};
+
+export type BallState = {
+  __typename: "BallState",
+  position: Vector,
+  velocity: Vector,
+};
+
+export type CarPlan = {
+  __typename: "CarPlan",
+  steps:  Array<PlanStep >,
+};
+
+export type PlanStep = {
+  __typename: "PlanStep",
+  waypoint: Vector,
+  useBoost: boolean,
+  startDodge: boolean,
 };
 
 export type UpdateTacticsLobbyInput = {
@@ -154,19 +195,57 @@ export type DeleteGameInput = {
 
 export type CreateGameRoundInput = {
   id?: string | null,
-  gameRoundsId?: string | null,
+  gameRoundsId: string,
+  initialCarStates: Array< CarStateInput >,
+  initialBallState: BallStateInput,
+  carPlans: Array< CarPlanInput >,
+};
+
+export type CarStateInput = {
+  car: CarInput,
+  boostAmount: number,
+  position: VectorInput,
+  velocity: VectorInput,
+};
+
+export type CarInput = {
+  id?: string | null,
+  team: number,
+};
+
+export type VectorInput = {
+  x: number,
+  y: number,
+};
+
+export type BallStateInput = {
+  position: VectorInput,
+  velocity: VectorInput,
+};
+
+export type CarPlanInput = {
+  steps: Array< PlanStepInput >,
+};
+
+export type PlanStepInput = {
+  waypoint: VectorInput,
+  useBoost: boolean,
+  startDodge: boolean,
 };
 
 export type ModelGameRoundConditionInput = {
+  gameRoundsId?: ModelIDInput | null,
   and?: Array< ModelGameRoundConditionInput | null > | null,
   or?: Array< ModelGameRoundConditionInput | null > | null,
   not?: ModelGameRoundConditionInput | null,
-  gameRoundsId?: ModelIDInput | null,
 };
 
 export type UpdateGameRoundInput = {
   id: string,
   gameRoundsId?: string | null,
+  initialCarStates?: Array< CarStateInput > | null,
+  initialBallState?: BallStateInput | null,
+  carPlans?: Array< CarPlanInput > | null,
 };
 
 export type DeleteGameRoundInput = {
@@ -205,10 +284,74 @@ export type ModelGameConnection = {
 
 export type ModelGameRoundFilterInput = {
   id?: ModelIDInput | null,
+  gameRoundsId?: ModelIDInput | null,
   and?: Array< ModelGameRoundFilterInput | null > | null,
   or?: Array< ModelGameRoundFilterInput | null > | null,
   not?: ModelGameRoundFilterInput | null,
-  gameRoundsId?: ModelIDInput | null,
+};
+
+export type ModelSubscriptionTacticsLobbyFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  name?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionTacticsLobbyFilterInput | null > | null,
+  or?: Array< ModelSubscriptionTacticsLobbyFilterInput | null > | null,
+};
+
+export type ModelSubscriptionIDInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  in?: Array< string | null > | null,
+  notIn?: Array< string | null > | null,
+};
+
+export type ModelSubscriptionStringInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  in?: Array< string | null > | null,
+  notIn?: Array< string | null > | null,
+};
+
+export type ModelSubscriptionGameFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  title?: ModelSubscriptionStringInput | null,
+  teamSize?: ModelSubscriptionIntInput | null,
+  and?: Array< ModelSubscriptionGameFilterInput | null > | null,
+  or?: Array< ModelSubscriptionGameFilterInput | null > | null,
+};
+
+export type ModelSubscriptionIntInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  in?: Array< number | null > | null,
+  notIn?: Array< number | null > | null,
+};
+
+export type ModelSubscriptionGameRoundFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  gameRoundsId?: ModelSubscriptionIDInput | null,
+  and?: Array< ModelSubscriptionGameRoundFilterInput | null > | null,
+  or?: Array< ModelSubscriptionGameRoundFilterInput | null > | null,
 };
 
 export type CreateTacticsLobbyMutationVariables = {
@@ -311,9 +454,9 @@ export type CreateGameMutation = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -338,9 +481,9 @@ export type UpdateGameMutation = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -365,9 +508,9 @@ export type DeleteGameMutation = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -385,9 +528,49 @@ export type CreateGameRoundMutation = {
   createGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
 };
 
@@ -400,9 +583,49 @@ export type UpdateGameRoundMutation = {
   updateGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
 };
 
@@ -415,9 +638,49 @@ export type DeleteGameRoundMutation = {
   deleteGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
 };
 
@@ -492,9 +755,9 @@ export type GetGameQuery = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -536,9 +799,49 @@ export type GetGameRoundQuery = {
   getGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
 };
 
@@ -554,12 +857,74 @@ export type ListGameRoundsQuery = {
     items:  Array< {
       __typename: "GameRound",
       id: string,
+      gameRoundsId: string,
+      initialCarStates:  Array< {
+        __typename: "CarState",
+        boostAmount: number,
+      } >,
       createdAt: string,
       updatedAt: string,
-      gameRoundsId?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
+};
+
+export type OnGameRoundByGameIdSubscriptionVariables = {
+  gameRoundsId: string,
+};
+
+export type OnGameRoundByGameIdSubscription = {
+  onGameRoundByGameId?:  {
+    __typename: "GameRound",
+    id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type OnCreateTacticsLobbySubscriptionVariables = {
+  filter?: ModelSubscriptionTacticsLobbyFilterInput | null,
 };
 
 export type OnCreateTacticsLobbySubscription = {
@@ -585,6 +950,10 @@ export type OnCreateTacticsLobbySubscription = {
   } | null,
 };
 
+export type OnUpdateTacticsLobbySubscriptionVariables = {
+  filter?: ModelSubscriptionTacticsLobbyFilterInput | null,
+};
+
 export type OnUpdateTacticsLobbySubscription = {
   onUpdateTacticsLobby?:  {
     __typename: "TacticsLobby",
@@ -606,6 +975,10 @@ export type OnUpdateTacticsLobbySubscription = {
     updatedAt: string,
     tacticsLobbyGameId?: string | null,
   } | null,
+};
+
+export type OnDeleteTacticsLobbySubscriptionVariables = {
+  filter?: ModelSubscriptionTacticsLobbyFilterInput | null,
 };
 
 export type OnDeleteTacticsLobbySubscription = {
@@ -631,6 +1004,10 @@ export type OnDeleteTacticsLobbySubscription = {
   } | null,
 };
 
+export type OnCreateGameSubscriptionVariables = {
+  filter?: ModelSubscriptionGameFilterInput | null,
+};
+
 export type OnCreateGameSubscription = {
   onCreateGame?:  {
     __typename: "Game",
@@ -642,15 +1019,19 @@ export type OnCreateGameSubscription = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
+};
+
+export type OnUpdateGameSubscriptionVariables = {
+  filter?: ModelSubscriptionGameFilterInput | null,
 };
 
 export type OnUpdateGameSubscription = {
@@ -664,15 +1045,19 @@ export type OnUpdateGameSubscription = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
+};
+
+export type OnDeleteGameSubscriptionVariables = {
+  filter?: ModelSubscriptionGameFilterInput | null,
 };
 
 export type OnDeleteGameSubscription = {
@@ -686,9 +1071,9 @@ export type OnDeleteGameSubscription = {
       items:  Array< {
         __typename: "GameRound",
         id: string,
+        gameRoundsId: string,
         createdAt: string,
         updatedAt: string,
-        gameRoundsId?: string | null,
       } | null >,
       nextToken?: string | null,
     } | null,
@@ -697,32 +1082,164 @@ export type OnDeleteGameSubscription = {
   } | null,
 };
 
+export type OnCreateGameRoundSubscriptionVariables = {
+  filter?: ModelSubscriptionGameRoundFilterInput | null,
+};
+
 export type OnCreateGameRoundSubscription = {
   onCreateGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
+};
+
+export type OnUpdateGameRoundSubscriptionVariables = {
+  filter?: ModelSubscriptionGameRoundFilterInput | null,
 };
 
 export type OnUpdateGameRoundSubscription = {
   onUpdateGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
+};
+
+export type OnDeleteGameRoundSubscriptionVariables = {
+  filter?: ModelSubscriptionGameRoundFilterInput | null,
 };
 
 export type OnDeleteGameRoundSubscription = {
   onDeleteGameRound?:  {
     __typename: "GameRound",
     id: string,
+    gameRoundsId: string,
+    initialCarStates:  Array< {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    } >,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+      },
+    },
+    carPlans:  Array< {
+      __typename: "CarPlan",
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
+      } >,
+    } >,
     createdAt: string,
     updatedAt: string,
-    gameRoundsId?: string | null,
   } | null,
 };

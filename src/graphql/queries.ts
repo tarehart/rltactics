@@ -57,9 +57,9 @@ export const getGame = /* GraphQL */ `
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -93,9 +93,40 @@ export const getGameRound = /* GraphQL */ `
   query GetGameRound($id: ID!) {
     getGameRound(id: $id) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
@@ -108,9 +139,12 @@ export const listGameRounds = /* GraphQL */ `
     listGameRounds(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
         id
+        gameRoundsId
+        initialCarStates {
+          boostAmount
+        }
         createdAt
         updatedAt
-        gameRoundsId
       }
       nextToken
     }

@@ -86,9 +86,9 @@ export const createGame = /* GraphQL */ `
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -109,9 +109,9 @@ export const updateGame = /* GraphQL */ `
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -132,9 +132,9 @@ export const deleteGame = /* GraphQL */ `
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -150,9 +150,40 @@ export const createGameRound = /* GraphQL */ `
   ) {
     createGameRound(input: $input, condition: $condition) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
@@ -163,9 +194,40 @@ export const updateGameRound = /* GraphQL */ `
   ) {
     updateGameRound(input: $input, condition: $condition) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
@@ -176,9 +238,40 @@ export const deleteGameRound = /* GraphQL */ `
   ) {
     deleteGameRound(input: $input, condition: $condition) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;

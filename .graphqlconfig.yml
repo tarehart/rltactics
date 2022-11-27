@@ -1,6 +1,6 @@
 projects:
   rltactics:
-    schemaPath: src/graphql/schema.json
+    schemaPath: amplify/backend/api/rltactics/build/schema.graphql
     includes:
       - src/graphql/**/*.ts
     excludes:

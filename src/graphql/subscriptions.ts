@@ -2,9 +2,52 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const onGameRoundByGameId = /* GraphQL */ `
+  subscription OnGameRoundByGameId($gameRoundsId: ID!) {
+    onGameRoundByGameId(gameRoundsId: $gameRoundsId) {
+      id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const onCreateTacticsLobby = /* GraphQL */ `
-  subscription OnCreateTacticsLobby {
-    onCreateTacticsLobby {
+  subscription OnCreateTacticsLobby(
+    $filter: ModelSubscriptionTacticsLobbyFilterInput
+  ) {
+    onCreateTacticsLobby(filter: $filter) {
       id
       name
       game {
@@ -24,8 +67,10 @@ export const onCreateTacticsLobby = /* GraphQL */ `
   }
 `;
 export const onUpdateTacticsLobby = /* GraphQL */ `
-  subscription OnUpdateTacticsLobby {
-    onUpdateTacticsLobby {
+  subscription OnUpdateTacticsLobby(
+    $filter: ModelSubscriptionTacticsLobbyFilterInput
+  ) {
+    onUpdateTacticsLobby(filter: $filter) {
       id
       name
       game {
@@ -45,8 +90,10 @@ export const onUpdateTacticsLobby = /* GraphQL */ `
   }
 `;
 export const onDeleteTacticsLobby = /* GraphQL */ `
-  subscription OnDeleteTacticsLobby {
-    onDeleteTacticsLobby {
+  subscription OnDeleteTacticsLobby(
+    $filter: ModelSubscriptionTacticsLobbyFilterInput
+  ) {
+    onDeleteTacticsLobby(filter: $filter) {
       id
       name
       game {
@@ -66,17 +113,17 @@ export const onDeleteTacticsLobby = /* GraphQL */ `
   }
 `;
 export const onCreateGame = /* GraphQL */ `
-  subscription OnCreateGame {
-    onCreateGame {
+  subscription OnCreateGame($filter: ModelSubscriptionGameFilterInput) {
+    onCreateGame(filter: $filter) {
       id
       title
       teamSize
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -86,17 +133,17 @@ export const onCreateGame = /* GraphQL */ `
   }
 `;
 export const onUpdateGame = /* GraphQL */ `
-  subscription OnUpdateGame {
-    onUpdateGame {
+  subscription OnUpdateGame($filter: ModelSubscriptionGameFilterInput) {
+    onUpdateGame(filter: $filter) {
       id
       title
       teamSize
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -106,17 +153,17 @@ export const onUpdateGame = /* GraphQL */ `
   }
 `;
 export const onDeleteGame = /* GraphQL */ `
-  subscription OnDeleteGame {
-    onDeleteGame {
+  subscription OnDeleteGame($filter: ModelSubscriptionGameFilterInput) {
+    onDeleteGame(filter: $filter) {
       id
       title
       teamSize
       rounds {
         items {
           id
+          gameRoundsId
           createdAt
           updatedAt
-          gameRoundsId
         }
         nextToken
       }
@@ -126,32 +173,131 @@ export const onDeleteGame = /* GraphQL */ `
   }
 `;
 export const onCreateGameRound = /* GraphQL */ `
-  subscription OnCreateGameRound {
-    onCreateGameRound {
+  subscription OnCreateGameRound(
+    $filter: ModelSubscriptionGameRoundFilterInput
+  ) {
+    onCreateGameRound(filter: $filter) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
 export const onUpdateGameRound = /* GraphQL */ `
-  subscription OnUpdateGameRound {
-    onUpdateGameRound {
+  subscription OnUpdateGameRound(
+    $filter: ModelSubscriptionGameRoundFilterInput
+  ) {
+    onUpdateGameRound(filter: $filter) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
 export const onDeleteGameRound = /* GraphQL */ `
-  subscription OnDeleteGameRound {
-    onDeleteGameRound {
+  subscription OnDeleteGameRound(
+    $filter: ModelSubscriptionGameRoundFilterInput
+  ) {
+    onDeleteGameRound(filter: $filter) {
       id
+      gameRoundsId
+      initialCarStates {
+        car {
+          id
+          team
+        }
+        boostAmount
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      initialBallState {
+        position {
+          x
+          y
+        }
+        velocity {
+          x
+          y
+        }
+      }
+      carPlans {
+        steps {
+          useBoost
+          startDodge
+        }
+      }
       createdAt
       updatedAt
-      gameRoundsId
     }
   }
 `;
