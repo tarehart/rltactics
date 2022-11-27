@@ -11,8 +11,14 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.1",
     "@aws-amplify/ui-vue": "^2.4.26",
+    "@vue/apollo-composable": "^4.0.0-beta.1",
+    "@vue/apollo-option": "^4.0.0-alpha.20",
     "aws-amplify": "^4.3.43",
+    "aws-appsync-auth-link": "^3.0.7",
+    "aws-appsync-subscription-link": "^3.1.2",
+    "graphql-tag": "^2.12.6",
     "three": "^0.146.0",
     "troisjs": "^0.3.4",
     "vue": "^3.2.41",

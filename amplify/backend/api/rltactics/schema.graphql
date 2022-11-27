@@ -12,6 +12,8 @@ type Game @model {
   id: ID!
   title: String!
   teamSize: Int!
+  # TODO: arrange for sorting by creation date.
+  # https://dev.to/rakannimer/pagination-sorting-with-aws-amplify-4l37
   rounds: [GameRound!]! @hasMany
 }
 
