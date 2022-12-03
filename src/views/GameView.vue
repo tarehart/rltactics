@@ -6,9 +6,15 @@
 
     <span>Created {{ gameResult.getGame.createdAt }}</span>
     <button @click="addRound">Add round</button>
-    <div v-for="round in gameResult.getGame.rounds?.items">
+    <div 
+      v-if="gameResult.getGame.rounds?.items" 
+      v-for="(round, index) in gameResult.getGame.rounds.items"
+    >
       <p v-if="round">
-        <GameRound :game-round-id="round?.id" />
+        <GameRound 
+          :game-round-id="round.id" 
+          :is-latest-round="index === gameResult.getGame.rounds.items.length - 1" 
+        />
       </p>
     </div>
   </div>

@@ -1,8 +1,7 @@
 <template>
   <div v-if="result?.getGameRound">
-    <h2>Welcome to the round!</h2>
-    <p>Round: {{ result.getGameRound.id }}</p>
-    <ul>
+    <p><span v-if="isLatestRound">[ACTIVE] </span>Round: {{ result.getGameRound.id }}</p>
+    <ul v-if="isLatestRound">
       <li v-if="result.getGameRound.initialBallState">
         Ball position: ({{ result.getGameRound.initialBallState.position.x }},
         {{ result.getGameRound.initialBallState.position.y }})
@@ -38,14 +37,15 @@ export default {
       result, loading, error, subscribeToMore,
     } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId }, { fetchPolicy: 'cache-only'});
 
-    // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
-    subscribeToMore({
-      document: gql(onUpdateGameRound),
-      variables: {
-        filter: { id: { eq: props.gameRoundId } }
-      },
-    });
-    
+    if (props.isLatestRound) {
+      // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
+      subscribeToMore({
+        document: gql(onUpdateGameRound),
+        variables: {
+          filter: { id: { eq: props.gameRoundId } }
+        },
+      });
+    }
 
     const { mutate } = useMutation<UpdateGameRoundMutation>(gql(updateGameRound));
 
