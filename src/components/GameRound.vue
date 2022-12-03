@@ -18,7 +18,6 @@ import type { GetGameRoundQuery, UpdateGameRoundMutation } from '@/API';
 import { updateGameRound } from '@/graphql/mutations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { ref } from 'vue';
 import { getGameRound } from '../graphql/queries';
 import { onUpdateGameRound } from '../graphql/subscriptions';
 
@@ -29,12 +28,15 @@ export default {
     gameRoundId: {
       type: String,
       required: true,
+    },
+    isLatestRound: {
+      type: Boolean,
     }
   },
   setup(props) {
     const {
       result, loading, error, subscribeToMore,
-    } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId });
+    } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId }, { fetchPolicy: 'cache-only'});
 
     // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
     subscribeToMore({
@@ -43,10 +45,10 @@ export default {
         filter: { id: { eq: props.gameRoundId } }
       },
     });
+    
 
     const { mutate } = useMutation<UpdateGameRoundMutation>(gql(updateGameRound));
 
-    const newTitle = ref('');
     const moveBall = () => {
       const arbitraryNumber = new Date().getSeconds();
       mutate({
@@ -60,6 +62,8 @@ export default {
     return {
       result,
       moveBall,
+      error,
+      loading,
     }
   },
 };

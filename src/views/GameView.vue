@@ -17,15 +17,16 @@
 </template>
 
 <script lang="ts">
-import type { CreateGameRoundMutation, GetGameQuery, UpdateGameMutation } from '@/API';
+import type { CreateGameRoundMutation, GetGameQuery, GetGameWithRoundsQuery, OnGameRoundByGameIdSubscription, UpdateGameMutation } from '@/API';
 import GeometryView from '@/components/GeometryView.vue';
 import { createGameRound, updateGame } from '@/graphql/mutations';
-import { useMutation, useQuery, useSubscription } from '@vue/apollo-composable';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { ref } from 'vue';
-import { getGame } from '../graphql/queries';
+import { getGame, getGameRound } from '../graphql/queries';
 import { onGameRoundByGameId, onUpdateGame } from '../graphql/subscriptions';
 import GameRound from '@/components/GameRound.vue';
+import { getGameWithRounds } from '@/graphql/customQueries';
 
 
 export default {
@@ -38,15 +39,34 @@ export default {
   },
   setup(props) {
     const {
-      result: gameResult, loading: gameLoading, error: gameError, subscribeToMore, refetch: gameRefetch,
-    } = useQuery<GetGameQuery>(gql(getGame), { id: props.gameId });
+      result: gameResult, loading: gameLoading, error: gameError, subscribeToMore, 
+      refetch: gameRefetch, onResult: onGameResult,
+    } = useQuery<GetGameWithRoundsQuery>(getGameWithRounds, { id: props.gameId });
 
     // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
+    // This will automatically update the game query in the cache, but *not*
+    // the gameRound queries.
     subscribeToMore({
       document: gql(onUpdateGame),
       variables: {
         filter: { id: { eq: props.gameId } }
       },
+    });
+
+    const { client } = useApolloClient();
+    // Proactively write the round data into the cache in the format of
+    // getGameRound queries. This is the only way to get a cache hit if
+    // we run a getGameRound query in the future.
+    onGameResult((data) => {
+      data.data.getGame?.rounds?.items.forEach((round) => {
+        if (round) {
+          client.writeQuery({
+            query: gql(getGameRound),
+            variables: { id: round.id },
+            data: { getGameRound: round },
+          });
+        }
+      });
     });
 
     const { mutate: updateGameMutation } = useMutation<UpdateGameMutation>(gql(updateGame));
@@ -58,24 +78,30 @@ export default {
       })
     }
 
-    // TODO: this thing is not writing to the apollo cache
-    const { onResult } = useSubscription(gql(onGameRoundByGameId), {
+    const { onResult } = useSubscription<OnGameRoundByGameIdSubscription>(gql(onGameRoundByGameId), {
       gameRoundsId: props.gameId,
     });
     onResult(result => {
+      if (!result.data?.onGameRoundByGameId) {
+        return;
+      }
       console.log("Got game round from subscription")
       console.log(JSON.stringify(result.data));
-      // TODO: instead of refetch, write directly to cache.
-      // Currently getting no coding assistance for the
-      // commented out code below, skeptical that it would work.
-      // const apolloClient = resolveClient();
-      // let data = apolloClient.readQuery<GetGameQuery>(gql(getGame), { id: props.gameId });
-      // apolloClient.writeQuery({
-      //   query: gql(getGame),
-      //   variables: { id: props.gameId },
-      //   data
-      // });
-      gameRefetch();
+      // Instead of refetch, write directly to cache.
+      // https://www.apollographql.com/docs/react/caching/cache-interaction/#using-updatequery-and-updatefragment
+      client.cache.updateQuery<GetGameQuery>({
+        query: gql(getGame), 
+        variables: { id: props.gameId }
+      }, (data) => {
+        if (!data?.getGame?.rounds?.items) {
+          return undefined; // Don't update cache.
+        }
+        return {
+          getGame: { ...data?.getGame, rounds: { 
+            ...data?.getGame?.rounds, items: [...data?.getGame?.rounds?.items, result.data?.onGameRoundByGameId]
+          }}
+        } as GetGameQuery;
+      });
     });
 
     const { mutate: createGameRoundMutation } = useMutation<CreateGameRoundMutation>(gql(createGameRound));

@@ -2,6 +2,71 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 
+export type Game = {
+  __typename: "Game",
+  id: string,
+  title: string,
+  teamSize: number,
+  rounds?: ModelGameRoundConnection | null,
+  createdAt: string,
+  updatedAt: string,
+};
+
+export type ModelGameRoundConnection = {
+  __typename: "ModelGameRoundConnection",
+  items:  Array<GameRound | null >,
+  nextToken?: string | null,
+};
+
+export type GameRound = {
+  __typename: "GameRound",
+  id: string,
+  gameRoundsId: string,
+  initialCarStates:  Array<CarState >,
+  initialBallState: BallState,
+  carPlans:  Array<CarPlan >,
+  createdAt: string,
+  updatedAt: string,
+};
+
+export type CarState = {
+  __typename: "CarState",
+  car: Car,
+  boostAmount: number,
+  position: Vector,
+  velocity: Vector,
+};
+
+export type Car = {
+  __typename: "Car",
+  id: string,
+  team: number,
+};
+
+export type Vector = {
+  __typename: "Vector",
+  x: number,
+  y: number,
+};
+
+export type BallState = {
+  __typename: "BallState",
+  position: Vector,
+  velocity: Vector,
+};
+
+export type CarPlan = {
+  __typename: "CarPlan",
+  steps:  Array<PlanStep >,
+};
+
+export type PlanStep = {
+  __typename: "PlanStep",
+  waypoint: Vector,
+  useBoost: boolean,
+  startDodge: boolean,
+};
+
 export type CreateTacticsLobbyInput = {
   id?: string | null,
   name: string,
@@ -80,71 +145,6 @@ export type TacticsLobby = {
   createdAt: string,
   updatedAt: string,
   tacticsLobbyGameId?: string | null,
-};
-
-export type Game = {
-  __typename: "Game",
-  id: string,
-  title: string,
-  teamSize: number,
-  rounds?: ModelGameRoundConnection | null,
-  createdAt: string,
-  updatedAt: string,
-};
-
-export type ModelGameRoundConnection = {
-  __typename: "ModelGameRoundConnection",
-  items:  Array<GameRound | null >,
-  nextToken?: string | null,
-};
-
-export type GameRound = {
-  __typename: "GameRound",
-  id: string,
-  gameRoundsId: string,
-  initialCarStates:  Array<CarState >,
-  initialBallState: BallState,
-  carPlans:  Array<CarPlan >,
-  createdAt: string,
-  updatedAt: string,
-};
-
-export type CarState = {
-  __typename: "CarState",
-  car: Car,
-  boostAmount: number,
-  position: Vector,
-  velocity: Vector,
-};
-
-export type Car = {
-  __typename: "Car",
-  id: string,
-  team: number,
-};
-
-export type Vector = {
-  __typename: "Vector",
-  x: number,
-  y: number,
-};
-
-export type BallState = {
-  __typename: "BallState",
-  position: Vector,
-  velocity: Vector,
-};
-
-export type CarPlan = {
-  __typename: "CarPlan",
-  steps:  Array<PlanStep >,
-};
-
-export type PlanStep = {
-  __typename: "PlanStep",
-  waypoint: Vector,
-  useBoost: boolean,
-  startDodge: boolean,
 };
 
 export type UpdateTacticsLobbyInput = {
@@ -352,6 +352,72 @@ export type ModelSubscriptionGameRoundFilterInput = {
   gameRoundsId?: ModelSubscriptionIDInput | null,
   and?: Array< ModelSubscriptionGameRoundFilterInput | null > | null,
   or?: Array< ModelSubscriptionGameRoundFilterInput | null > | null,
+};
+
+export type GetGameWithRoundsQueryVariables = {
+  id: string,
+};
+
+export type GetGameWithRoundsQuery = {
+  getGame?:  {
+    __typename: "Game",
+    id: string,
+    title: string,
+    teamSize: number,
+    rounds?:  {
+      __typename: "ModelGameRoundConnection",
+      items:  Array< {
+        __typename: "GameRound",
+        id: string,
+        gameRoundsId: string,
+        initialCarStates:  Array< {
+          __typename: "CarState",
+          car:  {
+            __typename: "Car",
+            id: string,
+            team: number,
+          },
+          boostAmount: number,
+          position:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+          },
+          velocity:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+          },
+        } >,
+        initialBallState:  {
+          __typename: "BallState",
+          position:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+          },
+          velocity:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+          },
+        },
+        carPlans:  Array< {
+          __typename: "CarPlan",
+          steps:  Array< {
+            __typename: "PlanStep",
+            useBoost: boolean,
+            startDodge: boolean,
+          } >,
+        } >,
+        createdAt: string,
+        updatedAt: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
 };
 
 export type CreateTacticsLobbyMutationVariables = {
