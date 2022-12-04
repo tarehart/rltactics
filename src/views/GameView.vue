@@ -23,18 +23,6 @@
 </template>
 
 <script lang="ts">
-import { 
-  type GameRound, 
-  type CreateCarPlanMutation, 
-  type CreateGameRoundMutation, 
-  type GetGameQuery, 
-  type GetGameWithRoundsQuery, 
-  type OnGameRoundByGameIdSubscription, 
-  type UpdateGameMutation, 
-  type CarPlan,
-  type CarState,
-  type CreateCarPlanInput,
-} from '@/API';
 import GeometryView from '@/components/GeometryView.vue';
 import { createGameRound, createCarPlan, updateGame } from '@/graphql/mutations';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable';
@@ -45,6 +33,18 @@ import { onGameRoundByGameId, onUpdateGame } from '../graphql/subscriptions';
 import GameRoundDisplay from '@/components/GameRoundDisplay.vue';
 import { getGameWithRounds } from '@/graphql/customQueries';
 import { generateUUID } from 'three/src/math/MathUtils';
+import type { 
+  GetGameWithRoundsQuery,
+  GameRound,
+  UpdateGameMutation,
+  OnGameRoundByGameIdSubscription,
+  GetGameQuery,
+  CreateGameRoundMutation,
+  CreateCarPlanMutation,
+  CarPlan,
+  CarState,
+  CreateCarPlanInput,
+} from '@/API';
 
 
 export default {
