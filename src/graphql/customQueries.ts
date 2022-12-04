@@ -25,21 +25,14 @@ export const getGameWithRounds = gql`
           }
           carPlans {
             items {
+              id
+              createdAt
+              updatedAt
+              gameRoundCarPlansId
               initialCarState {
                 car {
                   id
                   team
-                }
-                boostAmount
-                position {
-                  x
-                  y
-                  z
-                }
-                velocity {
-                  x
-                  y
-                  z
                 }
               }
             }

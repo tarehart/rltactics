@@ -445,25 +445,16 @@ export type GetGameWithRoundsQuery = {
           __typename: "ModelCarPlanConnection",
           items:  Array< {
             __typename: "CarPlan",
+            id: string,
+            createdAt: string,
+            updatedAt: string,
+            gameRoundCarPlansId: string,
             initialCarState:  {
               __typename: "CarState",
               car:  {
                 __typename: "Car",
                 id: string,
                 team: number,
-              },
-              boostAmount: number,
-              position:  {
-                __typename: "Vector",
-                x: number,
-                y: number,
-                z: number,
-              },
-              velocity:  {
-                __typename: "Vector",
-                x: number,
-                y: number,
-                z: number,
               },
             },
           } | null >,

@@ -11,7 +11,7 @@
       v-for="(round, index) in gameResult.getGame.rounds.items"
     >
       <p v-if="round">
-        <GameRound 
+        <GameRoundDisplay 
           :game-round-id="round.id" 
           :is-latest-round="index === gameResult.getGame.rounds.items.length - 1" 
         />
@@ -23,16 +23,28 @@
 </template>
 
 <script lang="ts">
-import type { CreateGameRoundMutation, GetGameQuery, GetGameWithRoundsQuery, OnGameRoundByGameIdSubscription, UpdateGameMutation } from '@/API';
+import { 
+  type GameRound, 
+  type CreateCarPlanMutation, 
+  type CreateGameRoundMutation, 
+  type GetGameQuery, 
+  type GetGameWithRoundsQuery, 
+  type OnGameRoundByGameIdSubscription, 
+  type UpdateGameMutation, 
+  type CarPlan,
+  type CarState,
+  type CreateCarPlanInput,
+} from '@/API';
 import GeometryView from '@/components/GeometryView.vue';
-import { createGameRound, updateGame } from '@/graphql/mutations';
+import { createGameRound, createCarPlan, updateGame } from '@/graphql/mutations';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { ref } from 'vue';
 import { getGame, getGameRound } from '../graphql/queries';
 import { onGameRoundByGameId, onUpdateGame } from '../graphql/subscriptions';
-import GameRound from '@/components/GameRound.vue';
+import GameRoundDisplay from '@/components/GameRoundDisplay.vue';
 import { getGameWithRounds } from '@/graphql/customQueries';
+import { generateUUID } from 'three/src/math/MathUtils';
 
 
 export default {
@@ -44,10 +56,21 @@ export default {
     }
   },
   setup(props) {
+
     const {
       result: gameResult, loading: gameLoading, error: gameError, subscribeToMore, 
       refetch: gameRefetch, onResult: onGameResult,
     } = useQuery<GetGameWithRoundsQuery>(getGameWithRounds, { id: props.gameId });
+
+    const getLatestRound = (): GameRound | null => {
+      if (gameResult.value?.getGame?.rounds?.items) {
+        const rounds = gameResult.value.getGame.rounds.items;
+        if (rounds.length > 0) {
+          return rounds[rounds.length - 1] as GameRound;
+        }
+      }
+      return null;
+    }
 
     // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
     // This will automatically update the game query in the cache, but *not*
@@ -110,7 +133,8 @@ export default {
       });
     });
 
-    const { mutate: createGameRoundMutation } = useMutation<CreateGameRoundMutation>(gql(createGameRound));
+    const { mutate: createGameRoundMutation, onDone: onGameRoundCreated } = useMutation<CreateGameRoundMutation>(gql(createGameRound));
+    const { mutate: createCarPlanMutation } = useMutation<CreateCarPlanMutation>(gql(createCarPlan));
     const addRound = () => {
       console.log("Adding.");
       createGameRoundMutation({
@@ -119,7 +143,65 @@ export default {
           gameRoundsId: props.gameId,
         }
       });
+      
     };
+
+    const getFinalState = (plan: CarPlan): CarState | null => {
+      if (!plan) return null;
+      if (plan.steps?.length > 0) {
+        const lastStep = plan.steps[plan.steps.length - 1];
+        return {
+          ...plan.initialCarState,
+          position: lastStep.waypoint.position,
+        } as CarState;
+      }
+      return plan.initialCarState;
+    };
+
+    onGameRoundCreated((gameRound) => {
+      const newRoundId = gameRound?.data?.createGameRound?.id
+      if (!newRoundId) {
+        return;
+      }
+      const previousRound = getLatestRound();
+      if (previousRound) {
+        previousRound.carPlans?.items?.forEach((plan) => {
+          if (!plan) return;
+          const initialState = getFinalState(plan);
+          createCarPlanMutation({
+            input: {
+              initialCarState: initialState,
+              gameRoundCarPlansId: newRoundId,
+              steps: [],
+            } as CreateCarPlanInput,
+          });
+        });
+      } else {
+        const teamSize = gameResult.value?.getGame?.teamSize;
+        if (typeof teamSize === 'number' && teamSize > 0) {
+          for (let team = 0; team <= 1; team++) {
+            for (let member = 0; member < teamSize; member++) {
+              createCarPlanMutation({
+                input: {
+                  initialCarState: {
+                    car: { 
+                      team, 
+                      name: `${team ? 'Orange' : 'Blue'} player ${member}`,
+                      id: generateUUID(),
+                    },
+                    boostAmount: 100,
+                    position: { x: member * 500, y: team ? 3000 : -3000, z: 0 },
+                    velocity: { x: 0, y: 0, z: 0 },
+                  }, 
+                  gameRoundCarPlansId: newRoundId,
+                  steps: [],
+                } as CreateCarPlanInput,
+              });
+            }
+          }
+        }
+      }
+    });
 
     return {
       gameResult,
@@ -128,6 +210,6 @@ export default {
       addRound,
     }
   },
-  components: { GeometryView, GameRound },
+  components: { GeometryView, GameRoundDisplay },
 };
 </script>

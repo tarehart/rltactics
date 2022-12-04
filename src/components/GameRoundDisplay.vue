@@ -1,15 +1,20 @@
 <template>
   <div v-if="result?.getGameRound">
     <p><span v-if="isLatestRound">[ACTIVE] </span>Round: {{ result.getGameRound.id }}</p>
-    <ul v-if="isLatestRound">
-      <li v-if="result.getGameRound.initialBallState">
+    <div v-if="isLatestRound">
+      <div v-if="result.getGameRound.initialBallState">
         Ball position: ({{ result.getGameRound.initialBallState.position.x }},
         {{ result.getGameRound.initialBallState.position.y }}, 
         {{ result.getGameRound.initialBallState.position.z }}
         )
         <button @click="moveBall">Move Ball</button>
-      </li>
-    </ul>
+      </div>
+      <ol>
+        <li v-for="carPlan in result.getGameRound.carPlans?.items">
+          <span v-if="carPlan">Car plan created at {{carPlan.createdAt}}</span>
+        </li>
+      </ol>
+    </div>
   </div>
   <div v-else>LOADING</div>
 </template>
@@ -37,7 +42,7 @@ export default {
   setup(props) {
     const {
       result, loading, error, subscribeToMore,
-    } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId }, { fetchPolicy: 'cache-only'});
+    } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId });
 
     if (props.isLatestRound) {
       // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
