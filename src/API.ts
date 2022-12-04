@@ -22,11 +22,39 @@ export type GameRound = {
   __typename: "GameRound",
   id: string,
   gameRoundsId: string,
-  initialCarStates:  Array<CarState >,
   initialBallState: BallState,
-  carPlans:  Array<CarPlan >,
+  carPlans?: ModelCarPlanConnection | null,
   createdAt: string,
   updatedAt: string,
+};
+
+export type BallState = {
+  __typename: "BallState",
+  position: Vector,
+  velocity: Vector,
+};
+
+export type Vector = {
+  __typename: "Vector",
+  x: number,
+  y: number,
+  z: number,
+};
+
+export type ModelCarPlanConnection = {
+  __typename: "ModelCarPlanConnection",
+  items:  Array<CarPlan | null >,
+  nextToken?: string | null,
+};
+
+export type CarPlan = {
+  __typename: "CarPlan",
+  id: string,
+  initialCarState: CarState,
+  steps:  Array<PlanStep >,
+  createdAt: string,
+  updatedAt: string,
+  gameRoundCarPlansId: string,
 };
 
 export type CarState = {
@@ -41,30 +69,20 @@ export type Car = {
   __typename: "Car",
   id: string,
   team: number,
-};
-
-export type Vector = {
-  __typename: "Vector",
-  x: number,
-  y: number,
-};
-
-export type BallState = {
-  __typename: "BallState",
-  position: Vector,
-  velocity: Vector,
-};
-
-export type CarPlan = {
-  __typename: "CarPlan",
-  steps:  Array<PlanStep >,
+  name?: string | null,
 };
 
 export type PlanStep = {
   __typename: "PlanStep",
-  waypoint: Vector,
+  waypoint: Waypoint,
   useBoost: boolean,
   startDodge: boolean,
+};
+
+export type Waypoint = {
+  __typename: "Waypoint",
+  position: Vector,
+  timeOffset?: number | null,
 };
 
 export type CreateTacticsLobbyInput = {
@@ -196,26 +214,7 @@ export type DeleteGameInput = {
 export type CreateGameRoundInput = {
   id?: string | null,
   gameRoundsId: string,
-  initialCarStates: Array< CarStateInput >,
   initialBallState: BallStateInput,
-  carPlans: Array< CarPlanInput >,
-};
-
-export type CarStateInput = {
-  car: CarInput,
-  boostAmount: number,
-  position: VectorInput,
-  velocity: VectorInput,
-};
-
-export type CarInput = {
-  id?: string | null,
-  team: number,
-};
-
-export type VectorInput = {
-  x: number,
-  y: number,
 };
 
 export type BallStateInput = {
@@ -223,14 +222,10 @@ export type BallStateInput = {
   velocity: VectorInput,
 };
 
-export type CarPlanInput = {
-  steps: Array< PlanStepInput >,
-};
-
-export type PlanStepInput = {
-  waypoint: VectorInput,
-  useBoost: boolean,
-  startDodge: boolean,
+export type VectorInput = {
+  x: number,
+  y: number,
+  z: number,
 };
 
 export type ModelGameRoundConditionInput = {
@@ -243,12 +238,59 @@ export type ModelGameRoundConditionInput = {
 export type UpdateGameRoundInput = {
   id: string,
   gameRoundsId?: string | null,
-  initialCarStates?: Array< CarStateInput > | null,
   initialBallState?: BallStateInput | null,
-  carPlans?: Array< CarPlanInput > | null,
 };
 
 export type DeleteGameRoundInput = {
+  id: string,
+};
+
+export type CreateCarPlanInput = {
+  id?: string | null,
+  initialCarState: CarStateInput,
+  steps: Array< PlanStepInput >,
+  gameRoundCarPlansId: string,
+};
+
+export type CarStateInput = {
+  car: CarInput,
+  boostAmount: number,
+  position: VectorInput,
+  velocity: VectorInput,
+};
+
+export type CarInput = {
+  id?: string | null,
+  team: number,
+  name?: string | null,
+};
+
+export type PlanStepInput = {
+  waypoint: WaypointInput,
+  useBoost: boolean,
+  startDodge: boolean,
+};
+
+export type WaypointInput = {
+  position: VectorInput,
+  timeOffset?: number | null,
+};
+
+export type ModelCarPlanConditionInput = {
+  and?: Array< ModelCarPlanConditionInput | null > | null,
+  or?: Array< ModelCarPlanConditionInput | null > | null,
+  not?: ModelCarPlanConditionInput | null,
+  gameRoundCarPlansId?: ModelIDInput | null,
+};
+
+export type UpdateCarPlanInput = {
+  id: string,
+  initialCarState?: CarStateInput | null,
+  steps?: Array< PlanStepInput > | null,
+  gameRoundCarPlansId: string,
+};
+
+export type DeleteCarPlanInput = {
   id: string,
 };
 
@@ -288,6 +330,14 @@ export type ModelGameRoundFilterInput = {
   and?: Array< ModelGameRoundFilterInput | null > | null,
   or?: Array< ModelGameRoundFilterInput | null > | null,
   not?: ModelGameRoundFilterInput | null,
+};
+
+export type ModelCarPlanFilterInput = {
+  id?: ModelIDInput | null,
+  and?: Array< ModelCarPlanFilterInput | null > | null,
+  or?: Array< ModelCarPlanFilterInput | null > | null,
+  not?: ModelCarPlanFilterInput | null,
+  gameRoundCarPlansId?: ModelIDInput | null,
 };
 
 export type ModelSubscriptionTacticsLobbyFilterInput = {
@@ -354,6 +404,12 @@ export type ModelSubscriptionGameRoundFilterInput = {
   or?: Array< ModelSubscriptionGameRoundFilterInput | null > | null,
 };
 
+export type ModelSubscriptionCarPlanFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  and?: Array< ModelSubscriptionCarPlanFilterInput | null > | null,
+  or?: Array< ModelSubscriptionCarPlanFilterInput | null > | null,
+};
+
 export type GetGameWithRoundsQueryVariables = {
   id: string,
 };
@@ -370,46 +426,49 @@ export type GetGameWithRoundsQuery = {
         __typename: "GameRound",
         id: string,
         gameRoundsId: string,
-        initialCarStates:  Array< {
-          __typename: "CarState",
-          car:  {
-            __typename: "Car",
-            id: string,
-            team: number,
-          },
-          boostAmount: number,
-          position:  {
-            __typename: "Vector",
-            x: number,
-            y: number,
-          },
-          velocity:  {
-            __typename: "Vector",
-            x: number,
-            y: number,
-          },
-        } >,
         initialBallState:  {
           __typename: "BallState",
           position:  {
             __typename: "Vector",
             x: number,
             y: number,
+            z: number,
           },
           velocity:  {
             __typename: "Vector",
             x: number,
             y: number,
+            z: number,
           },
         },
-        carPlans:  Array< {
-          __typename: "CarPlan",
-          steps:  Array< {
-            __typename: "PlanStep",
-            useBoost: boolean,
-            startDodge: boolean,
-          } >,
-        } >,
+        carPlans?:  {
+          __typename: "ModelCarPlanConnection",
+          items:  Array< {
+            __typename: "CarPlan",
+            initialCarState:  {
+              __typename: "CarState",
+              car:  {
+                __typename: "Car",
+                id: string,
+                team: number,
+              },
+              boostAmount: number,
+              position:  {
+                __typename: "Vector",
+                x: number,
+                y: number,
+                z: number,
+              },
+              velocity:  {
+                __typename: "Vector",
+                x: number,
+                y: number,
+                z: number,
+              },
+            },
+          } | null >,
+          nextToken?: string | null,
+        } | null,
         createdAt: string,
         updatedAt: string,
       } | null >,
@@ -595,46 +654,32 @@ export type CreateGameRoundMutation = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -650,46 +695,32 @@ export type UpdateGameRoundMutation = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -705,48 +736,172 @@ export type DeleteGameRoundMutation = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type CreateCarPlanMutationVariables = {
+  input: CreateCarPlanInput,
+  condition?: ModelCarPlanConditionInput | null,
+};
+
+export type CreateCarPlanMutation = {
+  createCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
     } >,
     createdAt: string,
     updatedAt: string,
+    gameRoundCarPlansId: string,
+  } | null,
+};
+
+export type UpdateCarPlanMutationVariables = {
+  input: UpdateCarPlanInput,
+  condition?: ModelCarPlanConditionInput | null,
+};
+
+export type UpdateCarPlanMutation = {
+  updateCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+    gameRoundCarPlansId: string,
+  } | null,
+};
+
+export type DeleteCarPlanMutationVariables = {
+  input: DeleteCarPlanInput,
+  condition?: ModelCarPlanConditionInput | null,
+};
+
+export type DeleteCarPlanMutation = {
+  deleteCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+    gameRoundCarPlansId: string,
   } | null,
 };
 
@@ -866,46 +1021,32 @@ export type GetGameRoundQuery = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -924,12 +1065,86 @@ export type ListGameRoundsQuery = {
       __typename: "GameRound",
       id: string,
       gameRoundsId: string,
-      initialCarStates:  Array< {
+      carPlans?:  {
+        __typename: "ModelCarPlanConnection",
+        nextToken?: string | null,
+      } | null,
+      createdAt: string,
+      updatedAt: string,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type GetCarPlanQueryVariables = {
+  id: string,
+};
+
+export type GetCarPlanQuery = {
+  getCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+    gameRoundCarPlansId: string,
+  } | null,
+};
+
+export type ListCarPlansQueryVariables = {
+  filter?: ModelCarPlanFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListCarPlansQuery = {
+  listCarPlans?:  {
+    __typename: "ModelCarPlanConnection",
+    items:  Array< {
+      __typename: "CarPlan",
+      id: string,
+      initialCarState:  {
         __typename: "CarState",
         boostAmount: number,
+      },
+      steps:  Array< {
+        __typename: "PlanStep",
+        useBoost: boolean,
+        startDodge: boolean,
       } >,
       createdAt: string,
       updatedAt: string,
+      gameRoundCarPlansId: string,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -944,46 +1159,32 @@ export type OnGameRoundByGameIdSubscription = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -1157,46 +1358,32 @@ export type OnCreateGameRoundSubscription = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -1211,46 +1398,32 @@ export type OnUpdateGameRoundSubscription = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
-    } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
   } | null,
@@ -1265,47 +1438,168 @@ export type OnDeleteGameRoundSubscription = {
     __typename: "GameRound",
     id: string,
     gameRoundsId: string,
-    initialCarStates:  Array< {
-      __typename: "CarState",
-      car:  {
-        __typename: "Car",
-        id: string,
-        team: number,
-      },
-      boostAmount: number,
-      position:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-      velocity:  {
-        __typename: "Vector",
-        x: number,
-        y: number,
-      },
-    } >,
     initialBallState:  {
       __typename: "BallState",
       position:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
       velocity:  {
         __typename: "Vector",
         x: number,
         y: number,
+        z: number,
       },
     },
-    carPlans:  Array< {
-      __typename: "CarPlan",
-      steps:  Array< {
-        __typename: "PlanStep",
-        useBoost: boolean,
-        startDodge: boolean,
-      } >,
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
+export type OnCreateCarPlanSubscriptionVariables = {
+  filter?: ModelSubscriptionCarPlanFilterInput | null,
+};
+
+export type OnCreateCarPlanSubscription = {
+  onCreateCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
     } >,
     createdAt: string,
     updatedAt: string,
+    gameRoundCarPlansId: string,
+  } | null,
+};
+
+export type OnUpdateCarPlanSubscriptionVariables = {
+  filter?: ModelSubscriptionCarPlanFilterInput | null,
+};
+
+export type OnUpdateCarPlanSubscription = {
+  onUpdateCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+    gameRoundCarPlansId: string,
+  } | null,
+};
+
+export type OnDeleteCarPlanSubscriptionVariables = {
+  filter?: ModelSubscriptionCarPlanFilterInput | null,
+};
+
+export type OnDeleteCarPlanSubscription = {
+  onDeleteCarPlan?:  {
+    __typename: "CarPlan",
+    id: string,
+    initialCarState:  {
+      __typename: "CarState",
+      car:  {
+        __typename: "Car",
+        id: string,
+        team: number,
+        name?: string | null,
+      },
+      boostAmount: number,
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    steps:  Array< {
+      __typename: "PlanStep",
+      waypoint:  {
+        __typename: "Waypoint",
+        timeOffset?: number | null,
+      },
+      useBoost: boolean,
+      startDodge: boolean,
+    } >,
+    createdAt: string,
+    updatedAt: string,
+    gameRoundCarPlansId: string,
   } | null,
 };

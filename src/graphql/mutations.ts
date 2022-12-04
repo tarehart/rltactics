@@ -151,36 +151,26 @@ export const createGameRound = /* GraphQL */ `
     createGameRound(input: $input, condition: $condition) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -195,36 +185,26 @@ export const updateGameRound = /* GraphQL */ `
     updateGameRound(input: $input, condition: $condition) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -239,39 +219,143 @@ export const deleteGameRound = /* GraphQL */ `
     deleteGameRound(input: $input, condition: $condition) {
       id
       gameRoundsId
-      initialCarStates {
+      initialBallState {
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      carPlans {
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const createCarPlan = /* GraphQL */ `
+  mutation CreateCarPlan(
+    $input: CreateCarPlanInput!
+    $condition: ModelCarPlanConditionInput
+  ) {
+    createCarPlan(input: $input, condition: $condition) {
+      id
+      initialCarState {
         car {
           id
           team
+          name
         }
         boostAmount
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
-      initialBallState {
-        position {
-          x
-          y
+      steps {
+        waypoint {
+          timeOffset
         }
-        velocity {
-          x
-          y
-        }
-      }
-      carPlans {
-        steps {
-          useBoost
-          startDodge
-        }
+        useBoost
+        startDodge
       }
       createdAt
       updatedAt
+      gameRoundCarPlansId
+    }
+  }
+`;
+export const updateCarPlan = /* GraphQL */ `
+  mutation UpdateCarPlan(
+    $input: UpdateCarPlanInput!
+    $condition: ModelCarPlanConditionInput
+  ) {
+    updateCarPlan(input: $input, condition: $condition) {
+      id
+      initialCarState {
+        car {
+          id
+          team
+          name
+        }
+        boostAmount
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      steps {
+        waypoint {
+          timeOffset
+        }
+        useBoost
+        startDodge
+      }
+      createdAt
+      updatedAt
+      gameRoundCarPlansId
+    }
+  }
+`;
+export const deleteCarPlan = /* GraphQL */ `
+  mutation DeleteCarPlan(
+    $input: DeleteCarPlanInput!
+    $condition: ModelCarPlanConditionInput
+  ) {
+    deleteCarPlan(input: $input, condition: $condition) {
+      id
+      initialCarState {
+        car {
+          id
+          team
+          name
+        }
+        boostAmount
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      steps {
+        waypoint {
+          timeOffset
+        }
+        useBoost
+        startDodge
+      }
+      createdAt
+      updatedAt
+      gameRoundCarPlansId
     }
   }
 `;

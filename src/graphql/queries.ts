@@ -94,36 +94,26 @@ export const getGameRound = /* GraphQL */ `
     getGameRound(id: $id) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -140,11 +130,70 @@ export const listGameRounds = /* GraphQL */ `
       items {
         id
         gameRoundsId
-        initialCarStates {
-          boostAmount
+        carPlans {
+          nextToken
         }
         createdAt
         updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+export const getCarPlan = /* GraphQL */ `
+  query GetCarPlan($id: ID!) {
+    getCarPlan(id: $id) {
+      id
+      initialCarState {
+        car {
+          id
+          team
+          name
+        }
+        boostAmount
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      steps {
+        waypoint {
+          timeOffset
+        }
+        useBoost
+        startDodge
+      }
+      createdAt
+      updatedAt
+      gameRoundCarPlansId
+    }
+  }
+`;
+export const listCarPlans = /* GraphQL */ `
+  query ListCarPlans(
+    $filter: ModelCarPlanFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listCarPlans(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        initialCarState {
+          boostAmount
+        }
+        steps {
+          useBoost
+          startDodge
+        }
+        createdAt
+        updatedAt
+        gameRoundCarPlansId
       }
       nextToken
     }

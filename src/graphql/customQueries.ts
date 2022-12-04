@@ -11,36 +11,39 @@ export const getGameWithRounds = gql`
         items {
           id
           gameRoundsId
-          initialCarStates {
-            car {
-              id
-              team
-            }
-            boostAmount
-            position {
-              x
-              y
-            }
-            velocity {
-              x
-              y
-            }
-          }
           initialBallState {
             position {
               x
               y
+              z
             }
             velocity {
               x
               y
+              z
             }
           }
           carPlans {
-            steps {
-              useBoost
-              startDodge
+            items {
+              initialCarState {
+                car {
+                  id
+                  team
+                }
+                boostAmount
+                position {
+                  x
+                  y
+                  z
+                }
+                velocity {
+                  x
+                  y
+                  z
+                }
+              }
             }
+            nextToken
           }
           createdAt
           updatedAt

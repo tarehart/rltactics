@@ -115,9 +115,7 @@ export default {
       console.log("Adding.");
       createGameRoundMutation({
         input: {
-          initialCarStates: [],
-          initialBallState: { position: { x: 0, y: 0 }, velocity: { x: 0, y: 0 } },
-          carPlans: [],
+          initialBallState: { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
           gameRoundsId: props.gameId,
         }
       });

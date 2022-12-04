@@ -7,36 +7,26 @@ export const onGameRoundByGameId = /* GraphQL */ `
     onGameRoundByGameId(gameRoundsId: $gameRoundsId) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -179,36 +169,26 @@ export const onCreateGameRound = /* GraphQL */ `
     onCreateGameRound(filter: $filter) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -222,36 +202,26 @@ export const onUpdateGameRound = /* GraphQL */ `
     onUpdateGameRound(filter: $filter) {
       id
       gameRoundsId
-      initialCarStates {
-        car {
-          id
-          team
-        }
-        boostAmount
-        position {
-          x
-          y
-        }
-        velocity {
-          x
-          y
-        }
-      }
       initialBallState {
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
       carPlans {
-        steps {
-          useBoost
-          startDodge
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
         }
+        nextToken
       }
       createdAt
       updatedAt
@@ -265,39 +235,134 @@ export const onDeleteGameRound = /* GraphQL */ `
     onDeleteGameRound(filter: $filter) {
       id
       gameRoundsId
-      initialCarStates {
+      initialBallState {
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      carPlans {
+        items {
+          id
+          createdAt
+          updatedAt
+          gameRoundCarPlansId
+        }
+        nextToken
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+export const onCreateCarPlan = /* GraphQL */ `
+  subscription OnCreateCarPlan($filter: ModelSubscriptionCarPlanFilterInput) {
+    onCreateCarPlan(filter: $filter) {
+      id
+      initialCarState {
         car {
           id
           team
+          name
         }
         boostAmount
         position {
           x
           y
+          z
         }
         velocity {
           x
           y
+          z
         }
       }
-      initialBallState {
-        position {
-          x
-          y
+      steps {
+        waypoint {
+          timeOffset
         }
-        velocity {
-          x
-          y
-        }
-      }
-      carPlans {
-        steps {
-          useBoost
-          startDodge
-        }
+        useBoost
+        startDodge
       }
       createdAt
       updatedAt
+      gameRoundCarPlansId
+    }
+  }
+`;
+export const onUpdateCarPlan = /* GraphQL */ `
+  subscription OnUpdateCarPlan($filter: ModelSubscriptionCarPlanFilterInput) {
+    onUpdateCarPlan(filter: $filter) {
+      id
+      initialCarState {
+        car {
+          id
+          team
+          name
+        }
+        boostAmount
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      steps {
+        waypoint {
+          timeOffset
+        }
+        useBoost
+        startDodge
+      }
+      createdAt
+      updatedAt
+      gameRoundCarPlansId
+    }
+  }
+`;
+export const onDeleteCarPlan = /* GraphQL */ `
+  subscription OnDeleteCarPlan($filter: ModelSubscriptionCarPlanFilterInput) {
+    onDeleteCarPlan(filter: $filter) {
+      id
+      initialCarState {
+        car {
+          id
+          team
+          name
+        }
+        boostAmount
+        position {
+          x
+          y
+          z
+        }
+        velocity {
+          x
+          y
+          z
+        }
+      }
+      steps {
+        waypoint {
+          timeOffset
+        }
+        useBoost
+        startDodge
+      }
+      createdAt
+      updatedAt
+      gameRoundCarPlansId
     }
   }
 `;

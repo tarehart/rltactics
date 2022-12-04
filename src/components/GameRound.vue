@@ -4,7 +4,9 @@
     <ul v-if="isLatestRound">
       <li v-if="result.getGameRound.initialBallState">
         Ball position: ({{ result.getGameRound.initialBallState.position.x }},
-        {{ result.getGameRound.initialBallState.position.y }})
+        {{ result.getGameRound.initialBallState.position.y }}, 
+        {{ result.getGameRound.initialBallState.position.z }}
+        )
         <button @click="moveBall">Move Ball</button>
       </li>
     </ul>
@@ -54,7 +56,7 @@ export default {
       mutate({
         input: {
           id: props.gameRoundId,
-          initialBallState: { position: { x: arbitraryNumber, y: 0 }, velocity: { x: 0, y: 0 } },
+          initialBallState: { position: { x: arbitraryNumber, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
         },
       })
     }
