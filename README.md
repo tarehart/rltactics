@@ -2,6 +2,18 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
+## Initial Setup
+- Install node + npm
+- `npm install -g @aws-amplify/cli`
+- `amplify configure`
+- `amplify pull` (this is done to create a file at ./aws-exports.js, there may be an easier way).
+- `npm run dev` to make sure it's running.
+- You may get a 401 on the graphql endpoint if you haven't worked on the project for a while. If so,
+    - Log in to AWS console
+    - Navigate to AWS AppSync settings. You'll probably see 'All key(s) expired'.
+    - Edit the API key's expiration to some date in the future.
+
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
