@@ -1,7 +1,7 @@
 <template>
   <div>
     <input type="text" v-model="name" placeholder="Lobby Title" />
-    <button v-on:click="createLobby">Create Lobby</button>
+    <button @click="createLobby">Create Lobby</button>
   </div>
 </template>
 

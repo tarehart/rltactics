@@ -14,6 +14,7 @@
           <span v-if="carPlan">Car plan created at {{carPlan.createdAt}}</span>
         </li>
       </ol>
+      <VueDrawingCanvas />
     </div>
   </div>
   <div v-else>LOADING</div>
@@ -26,52 +27,48 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { getGameRound } from '../graphql/queries';
 import { onUpdateGameRound } from '../graphql/subscriptions';
+import VueDrawingCanvas from './VueDrawingCanvas.vue';
 
 
 export default {
-  name: "gameRound",
-  props: {
-    gameRoundId: {
-      type: String,
-      required: true,
+    name: "gameRound",
+    props: {
+        gameRoundId: {
+            type: String,
+            required: true,
+        },
+        isLatestRound: {
+            type: Boolean,
+        }
     },
-    isLatestRound: {
-      type: Boolean,
-    }
-  },
-  setup(props) {
-    const {
-      result, loading, error, subscribeToMore,
-    } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId });
-
-    if (props.isLatestRound) {
-      // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
-      subscribeToMore({
-        document: gql(onUpdateGameRound),
-        variables: {
-          filter: { id: { eq: props.gameRoundId } }
-        },
-      });
-    }
-
-    const { mutate } = useMutation<UpdateGameRoundMutation>(gql(updateGameRound));
-
-    const moveBall = () => {
-      const arbitraryNumber = new Date().getSeconds();
-      mutate({
-        input: {
-          id: props.gameRoundId,
-          initialBallState: { position: { x: arbitraryNumber, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
-        },
-      })
-    }
-
-    return {
-      result,
-      moveBall,
-      error,
-      loading,
-    }
-  },
+    setup(props) {
+        const { result, loading, error, subscribeToMore, } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId });
+        if (props.isLatestRound) {
+            // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
+            subscribeToMore({
+                document: gql(onUpdateGameRound),
+                variables: {
+                    filter: { id: { eq: props.gameRoundId } }
+                },
+            });
+        }
+        const { mutate } = useMutation<UpdateGameRoundMutation>(gql(updateGameRound));
+        const moveBall = () => {
+            const arbitraryNumber = new Date().getSeconds();
+            mutate({
+                input: {
+                    id: props.gameRoundId,
+                    initialBallState: { position: { x: arbitraryNumber, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } },
+                },
+            });
+        };
+        return {
+            result,
+            moveBall,
+            error,
+            loading,
+        };
+    },
+    components: { VueDrawingCanvas }
 };
 </script>
