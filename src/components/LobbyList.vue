@@ -1,6 +1,6 @@
 <template>
   <ul v-if="result?.listTacticsLobbies?.items">
-    <li v-for="lobby in result.listTacticsLobbies.items">
+    <li v-for="lobby in result.listTacticsLobbies.items" :key="lobby?.id">
       <span v-if="lobby"><router-link :to="{ path: `/lobby/${lobby.id}` }">{{lobby?.name}}</router-link> - {{lobby?.createdAt}}</span>
     </li>
   </ul>
@@ -15,7 +15,7 @@ import { listTacticsLobbies } from '../graphql/queries';
 
 export default {
   name: "lobbyList",
-  setup(props) {
+  setup() {
     const {
       result, loading, error,
     } = useQuery<ListTacticsLobbiesQuery>(gql(listTacticsLobbies));

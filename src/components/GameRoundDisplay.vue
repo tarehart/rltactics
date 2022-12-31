@@ -10,7 +10,7 @@
         <button @click="moveBall">Move Ball</button>
       </div>
       <ol>
-        <li v-for="carPlan in result.getGameRound.carPlans?.items">
+        <li v-for="carPlan in result.getGameRound.carPlans?.items" :key="carPlan?.id">
           <span v-if="carPlan">Car plan created at {{carPlan.createdAt}}</span>
         </li>
       </ol>

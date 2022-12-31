@@ -17,7 +17,6 @@
 
 <script lang="ts">
   import type { Game, TacticsLobby } from '@/API';
-  import GeometryView from '@/components/GeometryView.vue';
   import type { GraphQLResult } from '@aws-amplify/api-graphql';
   import { API } from 'aws-amplify';
   import { getTacticsLobby } from '../graphql/queries';
@@ -63,7 +62,7 @@ import GameView from './GameView.vue';
           }
         }
     },
-    components: { GeometryView, GameView }
+    components: { GameView }
 };
 </script>
 

@@ -196,10 +196,15 @@ export default {
     }
   },
   methods: {
+    getCanvas() {
+      const canvas: HTMLCanvasElement | null = document.querySelector('#'+this.canvasId);
+      if (!canvas) {
+        throw Error("Canvas with id " + this.canvasId + " not found!");
+      }
+      return canvas;
+    },
     async setContext() {
-      let canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('#'+this.canvasId);
-      this.context = this.context ? this.context : canvas.getContext('2d');
-      
+      this.context = this.context ? this.context : this.getCanvas().getContext('2d');
       await this.setBackground();
     },
     drawInitialImage() {
@@ -211,7 +216,7 @@ export default {
     },
     drawAdditionalImages() {
       if (this.additionalImages && this.additionalImages.length > 0) {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('#'+this.canvasId);
+        const canvas = this.getCanvas();
         this.additionalImages.forEach((watermarkObject: any) => {
           this.drawWatermark(canvas, this.context, watermarkObject)
         });
@@ -225,9 +230,8 @@ export default {
       this.context.fillStyle = this.backgroundColor;
       this.context.fillRect(0, 0, Number(this.width), Number(this.height))
       
-      await this.$nextTick(async () => {
-        await this.drawBackgroundImage()
-      })
+      await this.$nextTick();
+      await this.drawBackgroundImage();
       this.save();
     },
     async drawBackgroundImage() {
@@ -250,20 +254,19 @@ export default {
       }
     },    
     getCoordinates(event: Event) {
-      let x, y;
-      if ((<TouchEvent>event).touches && (<TouchEvent>event).touches.length > 0) {
-        let canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('#'+this.canvasId);
-        let rect = canvas.getBoundingClientRect();
-        x = ((<TouchEvent>event).touches[0].clientX - rect.left);
-        y = ((<TouchEvent>event).touches[0].clientY - rect.top);
-      } else {
-        x = (<MouseEvent>event).offsetX;
-        y = (<MouseEvent>event).offsetY;
+      if (event instanceof TouchEvent && event.touches.length > 0) {
+        const canvas = this.getCanvas();
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: event.touches[0].clientX - rect.left,
+          y: event.touches[0].clientY - rect.top,
+        }
       }
-      return {
-        x: x,
-        y: y
+      if (event instanceof MouseEvent) {
+        return { x: event.offsetX, y: event.offsetY };
       }
+      return { x: 0, y: 0 };
+      
     },
     startDraw(event: Event) {
       if (!this.lock) {
@@ -288,7 +291,7 @@ export default {
         if (!this.context) {
           this.setContext();
         }
-        let coordinate = this.getCoordinates(event);
+        const coordinate = this.getCoordinates(event);
         if (this.eraser || this.strokeType === 'dash') {
           this.strokes.coordinates.push(coordinate);
           this.drawShape(this.context, this.strokes, false);
@@ -307,15 +310,16 @@ export default {
                 { x: this.strokes.from.x, y: this.strokes.from.y }
               ];
               break;
-            case 'triangle':
-              let center = Math.floor((coordinate.x - this.strokes.from.x) / 2) < 0 ? Math.floor((coordinate.x - this.strokes.from.x) / 2) * -1 : Math.floor((coordinate.x - this.strokes.from.x) / 2);
-              let width = this.strokes.from.x < coordinate.x ? this.strokes.from.x + center : this.strokes.from.x - center;
+            case 'triangle': {
+              const center = Math.floor((coordinate.x - this.strokes.from.x) / 2) < 0 ? Math.floor((coordinate.x - this.strokes.from.x) / 2) * -1 : Math.floor((coordinate.x - this.strokes.from.x) / 2);
+              const width = this.strokes.from.x < coordinate.x ? this.strokes.from.x + center : this.strokes.from.x - center;
               this.guides = [
                 { x: coordinate.x, y: this.strokes.from.y },
                 { x: width, y: coordinate.y }, 
                 { x: this.strokes.from.x, y: this.strokes.from.y }
               ];
               break;
+            }
             case 'half_triangle':
               this.guides = [
                 { x: coordinate.x, y: this.strokes.from.y },
@@ -323,13 +327,14 @@ export default {
                 { x: this.strokes.from.x, y: this.strokes.from.y }
               ];
               break;
-            case 'circle':
+            case 'circle': {
               let radiusX = this.strokes.from.x - coordinate.x < 0 ? (this.strokes.from.x - coordinate.x) * -1 : this.strokes.from.x - coordinate.x;
               this.guides = [
                 { x: this.strokes.from.x > coordinate.x ? this.strokes.from.x - radiusX : this.strokes.from.x + radiusX, y: this.strokes.from.y },
                 { x: radiusX, y: radiusX }
               ];
               break;
+            }
           }
           this.drawGuide(true);
         }
@@ -496,7 +501,7 @@ export default {
       }
     },
     save() {
-      let canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('#'+this.canvasId);
+      const canvas = this.getCanvas();
       if (this.watermark) {
         let temp = document.createElement('canvas');
         let ctx: CanvasRenderingContext2D | null = temp.getContext('2d')
@@ -506,7 +511,7 @@ export default {
           temp.height = Number(this.height);
           ctx.drawImage(canvas, 0, 0, Number(this.width), Number(this.height));
           
-          this.drawWatermark(temp, ctx, <WatermarkData>this.watermark)
+          this.drawWatermark(temp, ctx, this.watermark as WatermarkData)
         }
       } else {
         let temp = document.createElement('canvas');

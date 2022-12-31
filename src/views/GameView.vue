@@ -6,16 +6,18 @@
 
     <span>Created {{ gameResult.getGame.createdAt }}</span>
     <button @click="addRound">Add round</button>
-    <div 
-      v-if="gameResult.getGame.rounds?.items" 
-      v-for="(round, index) in gameResult.getGame.rounds.items"
-    >
-      <p v-if="round">
-        <GameRoundDisplay 
-          :game-round-id="round.id" 
-          :is-latest-round="index === gameResult.getGame.rounds.items.length - 1" 
-        />
-      </p>
+    <div v-if="gameResult.getGame.rounds?.items">
+      <div 
+        v-for="(round, index) in gameResult.getGame.rounds.items"
+        :key="round?.id"
+      >
+        <p v-if="round">
+          <GameRoundDisplay 
+            :game-round-id="round.id" 
+            :is-latest-round="index === gameResult.getGame.rounds.items.length - 1" 
+          />
+        </p>
+      </div>
     </div>
   </div>
   <span v-else>LOADING</span>
@@ -23,7 +25,6 @@
 </template>
 
 <script lang="ts">
-import GeometryView from '@/components/GeometryView.vue';
 import { createGameRound, createCarPlan, updateGame } from '@/graphql/mutations';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
@@ -58,8 +59,7 @@ export default {
   setup(props) {
 
     const {
-      result: gameResult, loading: gameLoading, error: gameError, subscribeToMore, 
-      refetch: gameRefetch, onResult: onGameResult,
+      result: gameResult, subscribeToMore, onResult: onGameResult,
     } = useQuery<GetGameWithRoundsQuery>(getGameWithRounds, { id: props.gameId });
 
     const getLatestRound = (): GameRound | null => {
@@ -127,7 +127,7 @@ export default {
         }
         return {
           getGame: { ...data?.getGame, rounds: { 
-            ...data?.getGame?.rounds, items: [...data?.getGame?.rounds?.items, result.data?.onGameRoundByGameId]
+            ...data?.getGame?.rounds, items: [...data?.getGame?.rounds?.items || [], result.data?.onGameRoundByGameId]
           }}
         } as GetGameQuery;
       });
@@ -210,6 +210,6 @@ export default {
       addRound,
     }
   },
-  components: { GeometryView, GameRoundDisplay },
+  components: { GameRoundDisplay },
 };
 </script>

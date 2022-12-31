@@ -14,10 +14,10 @@
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
   import type Three from 'three/src/Three';
   // import TrackballControls from 'three-trackballcontrols';
-  import { Box, Camera, LambertMaterial, PointLight, Renderer, Scene } from 'troisjs';
+  import { Camera, PointLight, Renderer, Scene } from 'troisjs';
 
   export default {
-    name: 'geometry',
+    name: 'geometryView',
     props: {
       filename: String
     },
@@ -32,6 +32,6 @@
         scene.add(loadedData.scene);
       },
     },
-    components: { Box, Camera, LambertMaterial, PointLight, Renderer, Scene },
+    components: { Camera, PointLight, Renderer, Scene },
   };
 </script>
