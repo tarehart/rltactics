@@ -59,12 +59,28 @@ interface WatermarkData {
   fontStyle?: WatermarkFontStyle
 }
 
+interface Coordinate {
+  x: number,
+  y: number,
+}
+
+interface StrokeSpec {
+  type: string,
+  from: Coordinate,
+  coordinates: Coordinate[],
+  color: string,
+  width: number,
+  fill: boolean,
+  lineCap: CanvasLineCap,
+  lineJoin: CanvasLineJoin,
+}
+
 interface DataInit {
   loadedImage: any;
   drawing: boolean;
   context: any;
-  images: any;
-  strokes: any;
+  lines: StrokeSpec[];
+  activeLine: StrokeSpec;
   guides: any;
   trash: any;
 }
@@ -94,10 +110,6 @@ export default {
     image: {
       type: String,
       default: () => ''
-    },
-    eraser: {
-      type: Boolean,
-      default: () => false
     },
     color: {
       type: String,
@@ -168,16 +180,16 @@ export default {
       loadedImage: null,
       drawing: false,
       context: null,
-      images: [],
-      strokes: {
+      lines: [],
+      activeLine: {
         type: '',
         from: { x: 0, y: 0 },
         coordinates: [],
         color: '',
-        width: '',
+        width: 0,
         fill: false,
-        lineCap: '',
-        lineJoin: ''
+        lineCap: 'round',
+        lineJoin: 'round',
       },
       guides: [],
       trash: []
@@ -210,7 +222,7 @@ export default {
     drawInitialImage() {
       if (this.initialImage && this.initialImage.length > 0) {
         // @ts-ignore
-        this.images = [].concat(this.images, this.initialImage)
+        this.lines = [].concat(this.lines, this.initialImage)
         this.redraw(true)
       }
     },
@@ -273,15 +285,15 @@ export default {
         this.drawing = true;
 
         let coordinate = this.getCoordinates(event);
-        this.strokes = {
-          type: this.eraser ? 'eraser' : this.strokeType,
+        this.activeLine = {
+          type: this.strokeType,
           from: coordinate,
           coordinates: [],
-          color: this.eraser ? this.backgroundColor : this.color,
+          color: this.color,
           width: this.lineWidth,
-          fill: this.eraser || this.strokeType === 'dash' || this.strokeType === 'line' ? false : this.fillShape,
-          lineCap: this.lineCap,
-          lineJoin: this.lineJoin
+          fill: this.strokeType === 'dash' || this.strokeType === 'line' ? false : this.fillShape,
+          lineCap: this.lineCap as CanvasLineCap,
+          lineJoin: this.lineJoin as CanvasLineJoin,
         };
         this.guides = [];
       }
@@ -292,98 +304,30 @@ export default {
           this.setContext();
         }
         const coordinate = this.getCoordinates(event);
-        if (this.eraser || this.strokeType === 'dash') {
-          this.strokes.coordinates.push(coordinate);
-          this.drawShape(this.context, this.strokes, false);
-        } else {
-          switch (this.strokeType) {
-            case 'line':
-              this.guides = [
-                { x: coordinate.x, y: coordinate.y }
-              ];
-              break;
-            case 'square':
-              this.guides = [
-                { x: coordinate.x, y: this.strokes.from.y },
-                { x: coordinate.x, y: coordinate.y },
-                { x: this.strokes.from.x, y: coordinate.y }, 
-                { x: this.strokes.from.x, y: this.strokes.from.y }
-              ];
-              break;
-            case 'triangle': {
-              const center = Math.floor((coordinate.x - this.strokes.from.x) / 2) < 0 ? Math.floor((coordinate.x - this.strokes.from.x) / 2) * -1 : Math.floor((coordinate.x - this.strokes.from.x) / 2);
-              const width = this.strokes.from.x < coordinate.x ? this.strokes.from.x + center : this.strokes.from.x - center;
-              this.guides = [
-                { x: coordinate.x, y: this.strokes.from.y },
-                { x: width, y: coordinate.y }, 
-                { x: this.strokes.from.x, y: this.strokes.from.y }
-              ];
-              break;
-            }
-            case 'half_triangle':
-              this.guides = [
-                { x: coordinate.x, y: this.strokes.from.y },
-                { x: this.strokes.from.x, y: coordinate.y }, 
-                { x: this.strokes.from.x, y: this.strokes.from.y }
-              ];
-              break;
-            case 'circle': {
-              let radiusX = this.strokes.from.x - coordinate.x < 0 ? (this.strokes.from.x - coordinate.x) * -1 : this.strokes.from.x - coordinate.x;
-              this.guides = [
-                { x: this.strokes.from.x > coordinate.x ? this.strokes.from.x - radiusX : this.strokes.from.x + radiusX, y: this.strokes.from.y },
-                { x: radiusX, y: radiusX }
-              ];
-              break;
-            }
-          }
-          this.drawGuide(true);
+        if (this.strokeType === 'dash') {
+          this.activeLine.coordinates.push(coordinate);
+          this.drawShape(this.context, this.activeLine, false);
         }
       }
     },
-    drawGuide(closingPath: boolean) {
-      this.redraw(true);
-      this.$nextTick(() => {
-        this.context.strokeStyle = this.color;
-        this.context.lineWidth = 1;
-        this.context.lineJoin = this.lineJoin;
-        this.context.lineCap = this.lineCap;
-
-        this.context.beginPath();
-        this.context.setLineDash([15, 15]);
-        if (this.strokes.type === 'circle') {
-          this.context.ellipse(this.guides[0].x, this.guides[0].y, this.guides[1].x, this.guides[1].y, 0, 0, Math.PI * 2);
-        } else {
-          this.context.moveTo(this.strokes.from.x, this.strokes.from.y);
-          this.guides.forEach((coordinate: {x: number, y: number}) => {
-            this.context.lineTo(coordinate.x, coordinate.y);
-          });
-          if (closingPath) {
-            this.context.closePath();
-          }
-        }
-        this.context.stroke();
-      })
-    },
-    drawShape(context: CanvasRenderingContext2D, strokes: any, closingPath: boolean) {
-      context.strokeStyle = strokes.color;
-      context.fillStyle = strokes.color;
-      context.lineWidth = strokes.width;
-      context.lineJoin = strokes.lineJoin === undefined ? this.lineJoin : strokes.lineJoin;
-      context.lineCap = strokes.lineCap === undefined ? this.lineCap : strokes.lineCap;
+    drawShape(context: CanvasRenderingContext2D, strokeSpec: StrokeSpec, closingPath: boolean) {
+      context.strokeStyle = strokeSpec.color;
+      context.fillStyle = strokeSpec.color;
+      context.lineWidth = strokeSpec.width;
+      context.lineJoin = strokeSpec.lineJoin === undefined ? this.lineJoin as CanvasLineJoin : strokeSpec.lineJoin;
+      context.lineCap = strokeSpec.lineCap === undefined ? this.lineCap as CanvasLineCap : strokeSpec.lineCap;
       context.beginPath();
       context.setLineDash([]);
-      if (strokes.type === 'circle') {
-        context.ellipse(strokes.coordinates[0].x, strokes.coordinates[0].y, strokes.coordinates[1].x, strokes.coordinates[1].y, 0, 0, Math.PI * 2);
-      } else {
-        context.moveTo(strokes.from.x, strokes.from.y);
-        strokes.coordinates.forEach((stroke: { x: number, y: number}) => {
-          context.lineTo(stroke.x, stroke.y);
-        });
-        if (closingPath) {
-          context.closePath();
-        }
+      
+      context.moveTo(strokeSpec.from.x, strokeSpec.from.y);
+      strokeSpec.coordinates.forEach((stroke: { x: number, y: number}) => {
+        context.lineTo(stroke.x, stroke.y);
+      });
+      if (closingPath) {
+        context.closePath();
       }
-      if (strokes.fill) {
+      
+      if (strokeSpec.fill) {
         context.fill();
       } else {
         context.stroke();
@@ -391,8 +335,8 @@ export default {
     },
     stopDraw() {
       if (this.drawing) {
-        this.strokes.coordinates = this.guides.length > 0 ? this.guides : this.strokes.coordinates;
-        this.images.push(this.strokes);
+        this.activeLine.coordinates = this.guides.length > 0 ? this.guides : this.activeLine.coordinates;
+        this.lines.push(this.activeLine);
         this.redraw(true);
         this.drawing = false;
         this.trash = [];
@@ -400,15 +344,16 @@ export default {
     },
     reset() {
       if (!this.lock) {
-        this.images = [];
-        this.strokes = {
+        this.lines = [];
+        this.activeLine = {
           type: '',
+          from: { x: 0, y: 0 },
           coordinates: [],
           color: '',
-          width: '',
+          width: 0,
           fill: false,
-          lineCap: '',
-          lineJoin: ''
+          lineCap: 'round',
+          lineJoin: 'round',
         };
         this.guides = [];
         this.trash = [];
@@ -417,9 +362,9 @@ export default {
     },
     undo() {
       if (!this.lock) {
-        let strokes = this.images.pop();
-        if (strokes) {
-          this.trash.push(strokes);
+        const line = this.lines.pop();
+        if (line) {
+          this.trash.push(line);
           this.redraw(true);
         }
       }
@@ -428,7 +373,7 @@ export default {
       if (!this.lock) {
         let strokes = this.trash.pop();
         if (strokes) {
-          this.images.push(strokes);
+          this.lines.push(strokes);
           this.redraw(true);
         }
       }
@@ -446,7 +391,7 @@ export default {
         baseCanvas.height = Number(this.height)
         
         if (baseCanvasContext) {
-          this.images.forEach((stroke: any) => {
+          this.lines.forEach((stroke: any) => {
             if (baseCanvasContext) {
               baseCanvasContext.globalCompositeOperation = stroke.type === 'eraser' ? 'destination-out' : 'source-over'
               if (stroke.type !== 'circle' || (stroke.type === 'circle' && stroke.coordinates.length > 0)) {
@@ -612,10 +557,10 @@ export default {
       }
     },
     isEmpty() {
-      return this.images.length > 0 ? false : true;
+      return this.lines.length > 0 ? false : true;
     },
     getAllStrokes() {
-      return this.images;
+      return this.lines;
     }
   },
 };
