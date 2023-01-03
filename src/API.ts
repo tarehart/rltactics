@@ -470,6 +470,82 @@ export type GetGameWithRoundsQuery = {
   } | null,
 };
 
+export type GetRoundWithPlansQueryVariables = {
+  id: string,
+};
+
+export type GetRoundWithPlansQuery = {
+  getGameRound?:  {
+    __typename: "GameRound",
+    id: string,
+    gameRoundsId: string,
+    initialBallState:  {
+      __typename: "BallState",
+      position:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+      velocity:  {
+        __typename: "Vector",
+        x: number,
+        y: number,
+        z: number,
+      },
+    },
+    carPlans?:  {
+      __typename: "ModelCarPlanConnection",
+      items:  Array< {
+        __typename: "CarPlan",
+        id: string,
+        createdAt: string,
+        updatedAt: string,
+        gameRoundCarPlansId: string,
+        initialCarState:  {
+          __typename: "CarState",
+          car:  {
+            __typename: "Car",
+            id: string,
+            team: number,
+          },
+          boostAmount: number,
+          position:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+            z: number,
+          },
+          velocity:  {
+            __typename: "Vector",
+            x: number,
+            y: number,
+            z: number,
+          },
+        },
+        steps:  Array< {
+          __typename: "PlanStep",
+          waypoint:  {
+            __typename: "Waypoint",
+            position:  {
+              __typename: "Vector",
+              x: number,
+              y: number,
+              z: number,
+            },
+            timeOffset?: number | null,
+          },
+          useBoost: boolean,
+          startDodge: boolean,
+        } >,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+  } | null,
+};
+
 export type CreateTacticsLobbyMutationVariables = {
   input: CreateTacticsLobbyInput,
   condition?: ModelTacticsLobbyConditionInput | null,

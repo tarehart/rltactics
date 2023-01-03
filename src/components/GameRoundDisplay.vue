@@ -14,20 +14,22 @@
           <span v-if="carPlan">Car plan created at {{carPlan.createdAt}}</span>
         </li>
       </ol>
-      <VueDrawingCanvas />
+      <VueDrawingCanvas :round-context="canvasRoundContext" :path-updated-callback="onPathUpdated" />
     </div>
   </div>
   <div v-else>LOADING</div>
 </template>
 
 <script lang="ts">
-import type { GetGameRoundQuery, UpdateGameRoundMutation } from '@/API';
-import { updateGameRound } from '@/graphql/mutations';
+import type { CarPlan, CarState, GetRoundWithPlansQuery, UpdateCarPlanInput, UpdateCarPlanMutation, UpdateGameRoundMutation } from '@/API';
+import { getRoundWithPlans } from '@/graphql/customQueries';
+import { updateCarPlan, updateGameRound } from '@/graphql/mutations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { getGameRound } from '../graphql/queries';
+import type { Vector3 } from 'three';
+import { ref } from 'vue';
 import { onUpdateGameRound } from '../graphql/subscriptions';
-import VueDrawingCanvas from './VueDrawingCanvas.vue';
+import VueDrawingCanvas, { type RoundContext } from './VueDrawingCanvas.vue';
 
 
 export default {
@@ -42,7 +44,7 @@ export default {
         }
     },
     setup(props) {
-        const { result, loading, error, subscribeToMore, } = useQuery<GetGameRoundQuery>(gql(getGameRound), { id: props.gameRoundId });
+        const { result, loading, error, subscribeToMore, onResult } = useQuery<GetRoundWithPlansQuery>(getRoundWithPlans, { id: props.gameRoundId });
         if (props.isLatestRound) {
             // https://v4.apollo.vuejs.org/guide-composable/subscription.html#subscribetomore
             subscribeToMore({
@@ -62,11 +64,49 @@ export default {
                 },
             });
         };
+
+        const canvasRoundContext = ref<RoundContext|undefined>(undefined);
+
+        onResult((gameRoundResult) => {
+          if (gameRoundResult.data.getGameRound?.carPlans) {
+            canvasRoundContext.value = {
+              carStarts: gameRoundResult.data.getGameRound.carPlans.items.map((plan) => plan?.initialCarState)
+            } as RoundContext;
+          }
+        });
+
+        const { mutate: mutateCarPlan } = useMutation<UpdateCarPlanMutation>(gql(updateCarPlan));
+
+        const onPathUpdated = (carStart: CarState, points: Vector3[]) => {
+          console.log(points);
+          if (result.value?.getGameRound?.carPlans) {
+            const carPlans = result.value.getGameRound.carPlans.items as CarPlan[];
+            const matchingPlan = carPlans.find((plan: CarPlan) => carStart.car.id === plan.initialCarState.car.id);
+            if (matchingPlan) {
+              const waypoints = points.map((point) => ({
+                waypoint: { position: { x: point.x, y: point.y, z: point.z } },
+                useBoost: false, 
+                startDodge: false,
+              }));
+              mutateCarPlan({
+                input: {
+                  id: matchingPlan.id,
+                  steps: waypoints,
+                  gameRoundCarPlansId: result.value.getGameRound.id,
+                } as UpdateCarPlanInput
+              });
+            }
+          }
+          
+        };
+        
         return {
-            result,
-            moveBall,
-            error,
-            loading,
+          result,
+          moveBall,
+          error,
+          loading,
+          canvasRoundContext,
+          onPathUpdated,
         };
     },
     components: { VueDrawingCanvas }

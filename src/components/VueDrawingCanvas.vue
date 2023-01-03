@@ -32,6 +32,13 @@
 Copied from https://github.com/razztyfication/vue-drawing-canvas/blob/master/src/VueDrawingCanvas.ts and modified.
 */
 
+import type { Car, CarState } from '@/API';
+import { simplify } from '@/util/simplify';
+import { Vector3 } from 'three';
+import type { PropType } from 'vue';
+
+const UU_PER_PIXEL = 32;
+
 /* eslint-disable no-debugger, no-console */
 
 interface WatermarkImageStyle {
@@ -65,14 +72,12 @@ interface Coordinate {
 }
 
 interface StrokeSpec {
-  type: string,
+  rawClickCoordinate: Coordinate,
   from: Coordinate,
   coordinates: Coordinate[],
   color: string,
   width: number,
-  fill: boolean,
-  lineCap: CanvasLineCap,
-  lineJoin: CanvasLineJoin,
+  carStart: CarState,
 }
 
 interface DataInit {
@@ -80,24 +85,27 @@ interface DataInit {
   drawing: boolean;
   context: any;
   lines: StrokeSpec[];
-  activeLine: StrokeSpec;
-  guides: any;
+  activeLine?: StrokeSpec;
   trash: any;
+}
+
+export interface PathUpdatedFunction {
+  (carStart: CarState, waypoints: Vector3[]): any;
+}
+
+export interface RoundContext {
+  carStarts: CarState[];
 }
 
 export default {
   name: 'VueDrawingCanvas',
   props: {
-    strokeType: {
-      type: String,
-      validator: (value: string): boolean => {
-        return ['dash', 'line', 'square', 'circle', 'triangle', 'half_triangle'].indexOf(value) !== -1
-      },
-      default: () => 'dash'
+    roundContext: {
+      type: Object as PropType<RoundContext>,
     },
-    fillShape: {
-      type: Boolean,
-      default: () => false
+    pathUpdatedCallback: {
+      type: Function as PropType<PathUpdatedFunction>,
+      required: true,
     },
     width: {
       type: [String, Number],
@@ -118,20 +126,6 @@ export default {
     lineWidth: {
       type: Number,
       default: () => 5
-    },
-    lineCap: {
-      type: String,
-      validator: (value: string): boolean => {
-        return ['round', 'square', 'butt'].indexOf(value) !== -1
-      },
-      default: () => 'round'
-    },
-    lineJoin: {
-      type: String,
-      validator: (value: string): boolean => {
-        return ['miter', 'round', 'bevel'].indexOf(value) !== -1
-      },
-      default: () => 'miter'
     },
     lock: {
       type: Boolean,
@@ -181,17 +175,7 @@ export default {
       drawing: false,
       context: null,
       lines: [],
-      activeLine: {
-        type: '',
-        from: { x: 0, y: 0 },
-        coordinates: [],
-        color: '',
-        width: 0,
-        fill: false,
-        lineCap: 'round',
-        lineJoin: 'round',
-      },
-      guides: [],
+      activeLine: undefined,
       trash: []
     };
   },
@@ -285,17 +269,43 @@ export default {
         this.drawing = true;
 
         let coordinate = this.getCoordinates(event);
-        this.activeLine = {
-          type: this.strokeType,
-          from: coordinate,
-          coordinates: [],
-          color: this.color,
-          width: this.lineWidth,
-          fill: this.strokeType === 'dash' || this.strokeType === 'line' ? false : this.fillShape,
-          lineCap: this.lineCap as CanvasLineCap,
-          lineJoin: this.lineJoin as CanvasLineJoin,
-        };
-        this.guides = [];
+        let fieldCoordinate = new Vector3(coordinate.x, coordinate.y, 0).multiplyScalar(UU_PER_PIXEL);
+        let color = this.color;
+
+        if (this.roundContext && this.roundContext.carStarts.length) {
+          let closestDistance = Number.MAX_VALUE;
+          let closestCarStart: CarState = this.roundContext.carStarts[0];
+          this.roundContext.carStarts.forEach((carStart) => {
+            const startPos = new Vector3(carStart.position.x, carStart.position.y, carStart.position.z);
+            const distance = fieldCoordinate.distanceTo(startPos);
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestCarStart = carStart;
+            }
+          });
+
+          color = closestCarStart.car.team === 0 ? 'blue' : 'orange';
+
+          const existingIndex = this.lines.findIndex((ln) => ln.carStart.car.id === closestCarStart.car.id);
+          if (existingIndex >= 0) {
+            this.lines.splice(existingIndex, 1);
+            this.redraw(true);
+          }
+
+          const carPosition = closestCarStart.position;
+          const pixelCoordinateOfCar = { x: carPosition.x / UU_PER_PIXEL, y: carPosition.y / UU_PER_PIXEL };
+
+          this.activeLine = {
+            rawClickCoordinate: coordinate,
+            from: pixelCoordinateOfCar,
+            coordinates: [],
+            color: color,
+            width: this.lineWidth,
+            carStart: closestCarStart,
+          };
+        }
+        
+        
       }
     },
     draw(event: Event) {
@@ -304,18 +314,24 @@ export default {
           this.setContext();
         }
         const coordinate = this.getCoordinates(event);
-        if (this.strokeType === 'dash') {
-          this.activeLine.coordinates.push(coordinate);
-          this.drawShape(this.context, this.activeLine, false);
+        if (this.activeLine) {
+          const carPosition = this.activeLine.carStart.position;
+          const pixelCoordinateOfCar = { x: carPosition.x / UU_PER_PIXEL, y: carPosition.y / UU_PER_PIXEL };
+          const modifiedCoordinate = { 
+            x: coordinate.x + pixelCoordinateOfCar.x - this.activeLine.rawClickCoordinate.x, 
+            y: coordinate.y + pixelCoordinateOfCar.y - this.activeLine.rawClickCoordinate.y,
+          }
+          this.activeLine.coordinates.push(modifiedCoordinate);
+          this.drawShape(this.context, this.activeLine);
         }
       }
     },
-    drawShape(context: CanvasRenderingContext2D, strokeSpec: StrokeSpec, closingPath: boolean) {
+    drawShape(context: CanvasRenderingContext2D, strokeSpec: StrokeSpec) {
       context.strokeStyle = strokeSpec.color;
       context.fillStyle = strokeSpec.color;
       context.lineWidth = strokeSpec.width;
-      context.lineJoin = strokeSpec.lineJoin === undefined ? this.lineJoin as CanvasLineJoin : strokeSpec.lineJoin;
-      context.lineCap = strokeSpec.lineCap === undefined ? this.lineCap as CanvasLineCap : strokeSpec.lineCap;
+      context.lineJoin = 'round';
+      context.lineCap = 'round';
       context.beginPath();
       context.setLineDash([]);
       
@@ -323,20 +339,17 @@ export default {
       strokeSpec.coordinates.forEach((stroke: { x: number, y: number}) => {
         context.lineTo(stroke.x, stroke.y);
       });
-      if (closingPath) {
-        context.closePath();
-      }
-      
-      if (strokeSpec.fill) {
-        context.fill();
-      } else {
-        context.stroke();
-      }
+      context.stroke();
     },
     stopDraw() {
-      if (this.drawing) {
-        this.activeLine.coordinates = this.guides.length > 0 ? this.guides : this.activeLine.coordinates;
+      if (this.drawing && this.activeLine) {
         this.lines.push(this.activeLine);
+        const densePoints = this.activeLine.coordinates.map((coordinate) => {
+          return new Vector3(coordinate.x, coordinate.y, 0).multiplyScalar(UU_PER_PIXEL);
+        });
+        const simplePoints = simplify(densePoints, 50, false);
+        console.log(`Simplified path from ${densePoints.length} to ${simplePoints.length}`);
+        this.pathUpdatedCallback(this.activeLine.carStart, simplePoints);
         this.redraw(true);
         this.drawing = false;
         this.trash = [];
@@ -345,17 +358,7 @@ export default {
     reset() {
       if (!this.lock) {
         this.lines = [];
-        this.activeLine = {
-          type: '',
-          from: { x: 0, y: 0 },
-          coordinates: [],
-          color: '',
-          width: 0,
-          fill: false,
-          lineCap: 'round',
-          lineJoin: 'round',
-        };
-        this.guides = [];
+        this.activeLine = undefined;
         this.trash = [];
         this.redraw(true);
       }
@@ -395,7 +398,7 @@ export default {
             if (baseCanvasContext) {
               baseCanvasContext.globalCompositeOperation = stroke.type === 'eraser' ? 'destination-out' : 'source-over'
               if (stroke.type !== 'circle' || (stroke.type === 'circle' && stroke.coordinates.length > 0)) {
-                this.drawShape(baseCanvasContext, stroke, (stroke.type === 'eraser' || stroke.type === 'dash' || stroke.type === 'line' ? false : true))
+                this.drawShape(baseCanvasContext, stroke)
               }
             }
           })
